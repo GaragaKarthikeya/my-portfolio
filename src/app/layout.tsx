@@ -1,5 +1,5 @@
 "use client"; // Force client-side rendering
-import Link from "next/link";
+//import Link from "next/link";
 import { Analytics } from "@vercel/analytics/react";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
