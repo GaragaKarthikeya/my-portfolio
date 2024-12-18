@@ -31,10 +31,10 @@ export default function Projects() {
           },
         }}
       >
-        {/* Mapping Projects Dynamically */}
-        {projects.map((project, index) => (
+        {/* Render Project Cards */}
+        {projects.map((project) => (
           <motion.div
-            key={index}
+            key={project.title}
             variants={{
               hidden: { opacity: 0, y: 20 },
               visible: { opacity: 1, y: 0 },
