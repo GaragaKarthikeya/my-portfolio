@@ -21,45 +21,58 @@ export default function Projects() {
   ];
 
   return (
-    <div
-      className="flex flex-col items-center justify-center min-h-screen 
-      bg-gray-100 dark:bg-gray-900 px-6"
-    >
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 px-6 py-12">
       {/* Heading */}
-      <h1 className="text-5xl md:text-6xl font-bold text-gray-800 dark:text-gray-100 mb-10">
+      <motion.h1
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="text-5xl md:text-6xl font-bold text-gray-800 dark:text-gray-100 mb-10 text-center"
+      >
         My Projects
-      </h1>
+      </motion.h1>
 
-      {/* Grid Container */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl w-full">
+      {/* Projects Grid */}
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 w-full max-w-6xl"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={{
+          hidden: { opacity: 0, y: 50 },
+          visible: {
+            opacity: 1,
+            y: 0,
+            transition: { staggerChildren: 0.2 },
+          },
+        }}
+      >
         {projects.map((project, index) => (
           <motion.div
             key={index}
-            className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md 
-            hover:shadow-lg transform transition-all hover:-translate-y-2"
-            whileHover={{ scale: 1.03 }}
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: { opacity: 1, y: 0 },
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300"
           >
-            {/* Project Title */}
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-3">
+            <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-3">
               {project.title}
             </h2>
-
-            {/* Project Description */}
             <p className="text-gray-600 dark:text-gray-300 mb-4">
               {project.description}
             </p>
-
-            {/* View Project Link */}
             <a
               href={project.link}
-              className="inline-block px-4 py-2 rounded-full bg-blue-500 text-white 
-              hover:bg-blue-600 transition-transform transform hover:scale-105"
+              className="inline-block px-5 py-2 bg-blue-500 text-white font-medium rounded-full hover:bg-blue-600 transition-all duration-300"
             >
               View Project
             </a>
           </motion.div>
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 }
