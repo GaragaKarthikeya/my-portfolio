@@ -1,0 +1,92 @@
+[
+    {
+      "title": "Banking Notification App",
+      "description": "A Flutter app that extracts banking details using ML algorithms.",
+      "link": "https://github.com/username/banking-app",
+      "image": "/images/project1.png"
+    },
+    {
+      "title": "ML SMS Extractor",
+      "description": "Machine Learning app to extract and detect banking data from SMS.",
+      "link": "https://github.com/username/ml-sms-extractor",
+      "image": "/images/project2.png"
+    },
+    {
+      "title": "Portfolio Website",
+      "description": "A dynamic portfolio website built with Next.js and Tailwind CSS.",
+      "link": "https://github.com/username/portfolio",
+      "image": "/images/project3.png"
+    },
+    {
+      "title": "Notification Data Tracker",
+      "description": "A tracker that automatically updates financial information by reading notifications.",
+      "link": "https://github.com/username/notification-tracker",
+      "image": "/images/project4.png"
+    },
+    {
+      "title": "Digital Design Learning Tool",
+      "description": "A tool to help students practice and understand digital design concepts effectively.",
+      "link": "https://github.com/username/digital-design-tool",
+      "image": "/images/project5.png"
+    },
+    {
+      "title": "DSA Visualization Platform",
+      "description": "An interactive web app to visualize Data Structures and Algorithms.",
+      "link": "https://github.com/username/dsa-visualizer",
+      "image": "/images/project6.png"
+    },
+    {
+      "title": "Linear Algebra Solver",
+      "description": "A Python-based solver for linear algebra problems, focusing on matrices and vectors.",
+      "link": "https://github.com/username/linear-algebra-solver",
+      "image": "/images/project7.png"
+    },
+    {
+      "title": "STEM Expo Organizer Tool",
+      "description": "A web app designed to organize and manage STEM expos for schools.",
+      "link": "https://github.com/username/stem-expo-tool",
+      "image": "/images/project8.png"
+    },
+    {
+      "title": "Physical Education Tracker",
+      "description": "An app to log and track physical education activities and fitness progress.",
+      "link": "https://github.com/username/pe-tracker",
+      "image": "/images/project9.png"
+    },
+    {
+      "title": "Economics Calculator",
+      "description": "A mobile app for solving economic problems and visualizing key concepts.",
+      "link": "https://github.com/username/economics-calculator",
+      "image": "/images/project10.png"
+    },
+    {
+      "title": "Credit Card Fraud Detector",
+      "description": "A machine learning model to detect fraudulent transactions in banking data.",
+      "link": "https://github.com/username/fraud-detector",
+      "image": "/images/project11.png"
+    },
+    {
+      "title": "AI Chatbot Assistant",
+      "description": "A chatbot designed to help with academic and project queries.",
+      "link": "https://github.com/username/chatbot-assistant",
+      "image": "/images/project12.png"
+    },
+    {
+      "title": "Open Source Contributions Tracker",
+      "description": "A tracker to manage and showcase open source contributions across platforms.",
+      "link": "https://github.com/username/oss-tracker",
+      "image": "/images/project13.png"
+    },
+    {
+      "title": "Flutter-based Weather App",
+      "description": "A minimalistic weather app with live updates and forecasts.",
+      "link": "https://github.com/username/weather-app",
+      "image": "/images/project14.png"
+    },
+    {
+      "title": "Graph Theory Visualizer",
+      "description": "An interactive tool to visualize graphs and algorithms like BFS, DFS, and Dijkstra.",
+      "link": "https://github.com/username/graph-visualizer",
+      "image": "/images/project15.png"
+    }
+]
