@@ -7,10 +7,11 @@ type ProjectProps = {
   
   export default function ProjectCard({ title, description, link, image }: ProjectProps) {
     return (
-      <div className="bg-gray-800 text-white rounded-lg shadow-lg hover:shadow-2xl transition-transform duration-300 overflow-hidden">
+      <div
+        className="bg-white text-black dark:bg-gray-800 dark:text-white rounded-lg shadow-lg hover:shadow-2xl transition-transform duration-300 overflow-hidden"
+      >
         {/* Responsive Image */}
         <div className="relative w-full h-40 sm:h-48 md:block hidden">
-          {/* Images will be hidden on small screens */}
           <img
             src={image}
             alt={title}
