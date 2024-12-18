@@ -11,6 +11,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     console.log("Vercel Analytics Loaded");
   }, []);
 
+  return (
+    <html lang="en">
+      <body>
+        <Navbar /> {/* Add the Navbar component here */}
+        <main className="p-6">{children}</main>
+        <Footer /> {/* Use the Footer Component */}
+        <Analytics />
+      </body>
+    </html>
+  );
+}
+
+function Navbar() {
   const pathname = usePathname();
 
   const linkClass = (path: string) =>
@@ -19,34 +32,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     }`;
 
   return (
-    <html lang="en">
-      <body>
-        <nav className="bg-gray-800 px-8 py-4 shadow-md">
-          <ul className="flex justify-center space-x-8 items-center">
-            <li>
-              <Link href="/" className={linkClass("/")}>
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link href="/about" className={linkClass("/about")}>
-                About
-              </Link>
-            </li>
-            <li>
-              <Link href="/projects" className={linkClass("/projects")}>
-                Projects
-              </Link>
-            </li>
-          </ul>
-        </nav>
-        <main className="p-6">{children}</main>
-
-        {/* Use the Footer Component */}
-        <Footer />
-
-        <Analytics />
-      </body>
-    </html>
+    <nav className="bg-gray-800 px-8 py-4 shadow-md">
+      <ul className="flex justify-center space-x-8 items-center">
+        <li>
+          <Link href="/" className={linkClass("/")}>
+            Home
+          </Link>
+        </li>
+        <li>
+          <Link href="/about" className={linkClass("/about")}>
+            About
+          </Link>
+        </li>
+        <li>
+          <Link href="/projects" className={linkClass("/projects")}>
+            Projects
+          </Link>
+        </li>
+      </ul>
+    </nav>
   );
 }
