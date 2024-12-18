@@ -10,15 +10,17 @@ export default function Home() {
       <div className="flex space-x-4">
         <a
           href="/about"
-          className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-shadow"
+          className="px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md 
+          hover:bg-blue-600 hover:scale-105 transition duration-300 ease-in-out"
         >
           About Me
         </a>
         <a
           href="/projects"
-          className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-shadow"
+          className="px-6 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-md 
+          hover:bg-green-600 hover:scale-105 transition duration-300 ease-in-out"
         >
-          Projects
+          My Projects
         </a>
       </div>
     </div>
