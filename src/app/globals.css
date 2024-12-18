@@ -1,7 +1,9 @@
+/* Tailwind CSS Directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Custom Global Styles */
 :root {
   --background: #ffffff;
   --foreground: #171717;
