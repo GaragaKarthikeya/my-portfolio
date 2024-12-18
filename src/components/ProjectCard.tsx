@@ -1,40 +1,37 @@
-import Image from "next/image";
-
 type ProjectProps = {
-  title: string;
-  description: string;
-  link: string;
-  image: string; // Path to image in /public/images
-};
-
-export default function ProjectCard({ title, description, link, image }: ProjectProps) {
-  return (
-    <div className="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300">
-      {/* Optimized Image */}
-      <div className="relative w-full h-48">
-        <Image
-          src={image}
-          alt={title}
-          layout="fill"
-          objectFit="cover"
-          className="rounded-t-xl"
-          priority
-        />
+    title: string;
+    description: string;
+    link: string;
+    image: string;
+  };
+  
+  export default function ProjectCard({ title, description, link, image }: ProjectProps) {
+    return (
+      <div className="bg-gray-800 text-white rounded-lg shadow-lg hover:shadow-2xl transition-transform duration-300 overflow-hidden">
+        {/* Responsive Image */}
+        <div className="relative w-full h-40 sm:h-48 md:block hidden">
+          {/* Images will be hidden on small screens */}
+          <img
+            src={image}
+            alt={title}
+            className="w-full h-full object-cover rounded-t-lg"
+          />
+        </div>
+  
+        {/* Content */}
+        <div className="p-4">
+          <h3 className="text-xl font-semibold mb-2">{title}</h3>
+          <p className="text-sm mb-4">{description}</p>
+          <a
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-full transition-colors"
+          >
+            View Project
+          </a>
+        </div>
       </div>
-      {/* Project Details */}
-      <h3 className="text-2xl font-bold mt-4 text-gray-800 dark:text-gray-100">
-        {title}
-      </h3>
-      <p className="text-gray-600 dark:text-gray-300 mt-2">{description}</p>
-      <a
-        href={link}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`View ${title}`}
-        className="inline-block mt-4 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all"
-      >
-        View Project
-      </a>
-    </div>
-  );
-}
+    );
+  }
+  
