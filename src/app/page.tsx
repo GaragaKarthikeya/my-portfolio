@@ -35,7 +35,7 @@ export default function Home() {
             href="/blogs"
             className="px-6 py-2 rounded-full bg-purple-500 text-white font-semibold hover:bg-purple-600 transform transition-transform hover:scale-105 mb-3"
           >
-            Blog
+            Blogs
           </a>
         </div>
 
