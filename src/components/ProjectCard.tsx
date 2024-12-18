@@ -7,9 +7,7 @@ type ProjectProps = {
   
   export default function ProjectCard({ title, description, link, image }: ProjectProps) {
     return (
-      <div
-        className="bg-white text-black dark:bg-gray-800 dark:text-white rounded-lg shadow-lg hover:shadow-2xl transition-transform duration-300 overflow-hidden"
-      >
+      <div className="bg-white text-black dark:bg-gray-800 dark:text-white rounded-lg shadow-lg hover:shadow-2xl transition-transform duration-300 overflow-hidden">
         {/* Responsive Image */}
         <div className="relative w-full h-40 sm:h-48 md:block hidden">
           <img
@@ -22,7 +20,8 @@ type ProjectProps = {
         {/* Content */}
         <div className="p-4">
           <h3 className="text-xl font-semibold mb-2">{title}</h3>
-          <p className="text-sm mb-4">{description}</p>
+          {/* Truncated Description */}
+          <p className="text-sm mb-4 line-clamp-3">{description}</p>
           <a
             href={link}
             target="_blank"
