@@ -1,3 +1,6 @@
+"use client";
+import { motion } from "framer-motion";
+
 export default function Projects() {
   const projects = [
     {
@@ -10,24 +13,51 @@ export default function Projects() {
       description: "Another amazing project description.",
       link: "#",
     },
-    // Add more projects here
+    {
+      title: "Project Title 3",
+      description: "Yet another project worth showcasing.",
+      link: "#",
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-white text-gray-800 p-8">
-      <h1 className="text-4xl font-bold mb-6 text-center">My Projects</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+    <div
+      className="flex flex-col items-center justify-center min-h-screen 
+      bg-gray-100 dark:bg-gray-900 px-6"
+    >
+      {/* Heading */}
+      <h1 className="text-5xl md:text-6xl font-bold text-gray-800 dark:text-gray-100 mb-10">
+        My Projects
+      </h1>
+
+      {/* Grid Container */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl w-full">
         {projects.map((project, index) => (
-          <div
+          <motion.div
             key={index}
-            className="bg-gray-100 p-4 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-2 transition duration-300"
+            className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md 
+            hover:shadow-lg transform transition-all hover:-translate-y-2"
+            whileHover={{ scale: 1.03 }}
           >
-            <h2 className="text-xl font-semibold mb-2">{project.title}</h2>
-            <p className="text-gray-600 mb-2">{project.description}</p>
-            <a href={project.link} className="text-blue-500 hover:underline">
+            {/* Project Title */}
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-3">
+              {project.title}
+            </h2>
+
+            {/* Project Description */}
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              {project.description}
+            </p>
+
+            {/* View Project Link */}
+            <a
+              href={project.link}
+              className="inline-block px-4 py-2 rounded-full bg-blue-500 text-white 
+              hover:bg-blue-600 transition-transform transform hover:scale-105"
+            >
               View Project
             </a>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>
