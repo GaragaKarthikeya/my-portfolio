@@ -48,7 +48,7 @@ export default function Navbar() {
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="relative z-50 w-full bg-white dark:bg-gray-900 shadow-md rounded-b-lg"
+        className="relative z-50 w-full bg-white dark:bg-blue-800 shadow-md rounded-b-lg"
       >
         <div className="flex justify-between items-center px-6 py-4">
           {/* Hamburger Icon */}
@@ -79,7 +79,6 @@ export default function Navbar() {
             aria-label="Toggle Theme"
           >
             {isDarkMode ? (
-              // Sun icon (for dark mode, indicating we can switch to light mode)
               <motion.svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -95,7 +94,6 @@ export default function Navbar() {
                 <path d="M12 2a1 1 0 110 2 1 1 0 010-2zm0 18a1 1 0 110 2 1 1 0 010-2zm9-9a1 1 0 110 2 1 1 0 010-2zM3 12a1 1 0 110 2 1 1 0 010-2zm15.071-5.071a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM6.343 17.657a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM6.343 6.343a1 1 0 010 1.414L5.636 8.464a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17.657 17.657a1 1 0 010 1.414L16.95 19.778a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0z" />
               </motion.svg>
             ) : (
-              // Moon icon (for light mode, indicating we can switch to dark mode)
               <motion.svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="currentColor"
@@ -120,7 +118,7 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ duration: 0.3 }}
-              className="fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-900 shadow-xl rounded-r-lg z-50"
+              className="fixed top-0 left-0 h-full w-64 bg-white dark:bg-blue-900 shadow-xl rounded-r-lg z-50"
             >
               <ul className="flex flex-col mt-8">
                 {menuItems.map((item) => (
