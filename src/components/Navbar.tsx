@@ -48,7 +48,7 @@ export default function Navbar() {
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="relative z-50 w-full bg-white dark:bg-[#1E1E2F] shadow-md rounded-b-lg"
+        className="relative z-50 w-full bg-white dark:bg-[#1F2937] shadow-md rounded-b-lg"
       >
         <div className="flex justify-between items-center px-6 py-4">
           {/* Hamburger Icon */}
@@ -118,7 +118,7 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ duration: 0.3 }}
-              className="fixed top-0 left-0 h-full w-64 bg-white dark:bg-[#2C3E50] shadow-xl rounded-r-lg z-50"
+              className="fixed top-0 left-0 h-full w-64 bg-white dark:bg-[#374151] shadow-xl rounded-r-lg z-50"
             >
               <ul className="flex flex-col mt-8">
                 {menuItems.map((item) => (
@@ -129,7 +129,7 @@ export default function Navbar() {
                   >
                     <Link
                       href={item.path}
-                      className="block w-full px-6 py-4 text-lg font-medium text-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#34495E] rounded-lg transition-all"
+                      className="block w-full px-6 py-4 text-lg font-medium text-gray-800 dark:text-[#D1D5DB] hover:bg-gray-100 dark:hover:bg-[#4B5563] rounded-lg transition-all"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {item.name}
