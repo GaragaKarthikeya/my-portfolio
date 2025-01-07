@@ -3,13 +3,32 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
+import Mark from "mark.js";
+
+import {
+  FaHome,
+  FaInfoCircle,
+  FaProjectDiagram,
+  FaBlog,
+  FaSun,
+  FaMoon,
+  FaTimes,
+} from "react-icons/fa";
 
 export default function Navbar() {
+  // --------------------
+  // STATE & CONSTANTS
+  // --------------------
+  const [mounted, setMounted] = useState(false); 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [language, setLanguage] = useState("en");
   const pathname = usePathname();
 
-  // Load theme preference on initial render
+  // --------------------
+  // LOAD & SAVE THEME
+  // --------------------
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
@@ -18,7 +37,6 @@ export default function Navbar() {
     }
   }, []);
 
-  // Toggle Theme
   const toggleTheme = () => {
     if (isDarkMode) {
       document.documentElement.classList.remove("dark");
@@ -30,122 +48,293 @@ export default function Navbar() {
     setIsDarkMode((prev) => !prev);
   };
 
-  // Toggle Menu
-  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
+  // --------------------
+  // MARK.JS EFFECT FOR FULL-PAGE SEARCH
+  // --------------------
+  useEffect(() => {
+    const context = document.querySelector("main");
+    if (!context) return;
+    const markInstance = new Mark(context);
+    if (searchQuery) {
+      markInstance.unmark({
+        done: () => {
+          markInstance.mark(searchQuery);
+        },
+      });
+    } else {
+      markInstance.unmark();
+    }
+  }, [searchQuery]);
 
-  // Navigation Items: Exclude Current Page
+  // --------------------
+  // MENU ITEMS
+  // --------------------
   const menuItems = [
-    { name: "Home", path: "/" },
-    { name: "About", path: "/about" },
-    { name: "Projects", path: "/projects" },
-    { name: "Blogs", path: "/blogs" },
-  ].filter((item) => item.path !== pathname);
+    { name: "Home", path: "/", icon: <FaHome className="mr-2" /> },
+    { name: "About", path: "/about", icon: <FaInfoCircle className="mr-2" /> },
+    { name: "Projects", path: "/projects", icon: <FaProjectDiagram className="mr-2" /> },
+    { name: "Blogs", path: "/blogs", icon: <FaBlog className="mr-2" /> },
+  ];
 
+  const filteredMenuItems = menuItems.filter((item) =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // --------------------
+  // HANDLERS
+  // --------------------
+  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
+  const handleLanguageChange = (e) => setLanguage(e.target.value);
+  const handleSearchChange = (e) => setSearchQuery(e.target.value);
+
+  // --------------------
+  // MOUNTING EFFECT
+  // --------------------
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // --------------------
+  // CONDITIONAL RENDERING AFTER MOUNT
+  // --------------------
+  if (!mounted) return null;
+
+  // --------------------
+  // NAVBAR RENDER
+  // --------------------
   return (
     <>
-      {/* Navbar */}
+      {/* MAIN NAVBAR */}
       <motion.nav
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="relative z-50 w-full bg-white dark:bg-[#1F2937] shadow-md rounded-b-lg"
+        className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1F2937] 
+                   shadow-md rounded-b-lg border-b-2 border-transparent dark:border-transparent"
       >
-        <div className="flex justify-between items-center px-6 py-4">
-          {/* Hamburger Icon */}
-          <button
-            onClick={toggleMenu}
-            className="text-gray-800 dark:text-gray-300 hover:scale-105 transition-transform"
-            aria-label="Toggle Menu"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              className="w-8 h-8"
-            >
-              {isMenuOpen ? (
-                <path d="M6 18L18 6M6 6l12 12" strokeWidth="2" />
-              ) : (
-                <path d="M4 6h16M4 12h16M4 18h16" strokeWidth="2" />
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          {/* Enhanced Mobile Search Bar */}
+          <div className="flex items-center md:hidden w-full px-4">
+            <div className="relative flex items-center bg-gray-100 dark:bg-gray-700 
+                            rounded-md overflow-hidden shadow-md w-full">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                placeholder="Search..."
+                className="w-full px-4 py-2 text-sm text-gray-800 dark:text-gray-200 
+                           bg-transparent focus:outline-none focus:ring-2 
+                           focus:ring-blue-400 transition-colors"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 text-gray-500 hover:text-gray-700"
+                >
+                  ✕
+                </button>
               )}
-            </svg>
-          </button>
+            </div>
+          </div>
 
-          {/* Theme Toggle */}
+          {/* DESKTOP MENU */}
+          <ul className="hidden md:flex space-x-4 items-center">
+            {filteredMenuItems.map((item) => {
+              const isActive = pathname === item.path;
+              return (
+                <li key={item.name}>
+                  <Link
+                    href={item.path}
+                    aria-label={`Go to ${item.name}`}
+                    className={`relative px-4 py-2 flex items-center transition-colors 
+                      duration-300 rounded-md ${
+                        isActive
+                          ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold"
+                          : "hover:bg-gray-100 dark:hover:bg-[#374151] text-gray-800 dark:text-gray-300"
+                      }`}
+                  >
+                    {item.icon}
+                    {item.name}
+                  </Link>
+                </li>
+              );
+            })}
+
+            {/* Desktop Search Bar */}
+            <div className="relative flex items-center bg-gray-100 
+                            dark:bg-[#2D3748] rounded-md overflow-hidden">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                placeholder="Search..."
+                className="w-32 px-2 py-1 text-sm text-gray-800 
+                           dark:text-gray-300 bg-transparent 
+                           focus:outline-none focus:ring 
+                           focus:ring-blue-400 rounded-md"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-1 text-gray-500 hover:text-gray-700"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* LANGUAGE SELECTOR */}
+            <select
+              aria-label="Language Selector"
+              value={language}
+              onChange={handleLanguageChange}
+              className="px-2 py-1 text-sm rounded-md bg-gray-100 dark:bg-[#2D3748] 
+                         text-gray-800 dark:text-gray-300 focus:outline-none 
+                         focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="en">EN</option>
+              <option value="es">ES</option>
+              <option value="fr">FR</option>
+            </select>
+
+            {/* CTA BUTTON */}
+            <li>
+              <Link
+                href="/contact"
+                aria-label="Contact Me"
+                className="ml-2 px-3 py-2 text-sm font-semibold text-white 
+                           bg-gradient-to-r from-blue-500 to-indigo-500 
+                           rounded-md hover:opacity-90 
+                           focus:outline-none focus:ring-2 focus:ring-blue-300"
+              >
+                Contact Me
+              </Link>
+            </li>
+          </ul>
+
+          {/* THEME TOGGLE */}
           <button
             onClick={toggleTheme}
-            className="hover:scale-110 transition-transform"
+            className="ml-4 hover:scale-110 transition-transform 
+                       focus:outline-none text-gray-800 dark:text-gray-300"
             aria-label="Toggle Theme"
           >
             {isDarkMode ? (
-              <motion.svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                className="w-7 h-7 text-yellow-400"
+              <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                className="inline-block"
               >
-                <path d="M12 2a1 1 0 110 2 1 1 0 010-2zm0 18a1 1 0 110 2 1 1 0 010-2zm9-9a1 1 0 110 2 1 1 0 010-2zM3 12a1 1 0 110 2 1 1 0 010-2zm15.071-5.071a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM6.343 17.657a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM6.343 6.343a1 1 0 010 1.414L5.636 8.464a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17.657 17.657a1 1 0 010 1.414L16.95 19.778a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0z" />
-              </motion.svg>
+                <FaSun className="text-yellow-400 w-6 h-6" />
+              </motion.div>
             ) : (
-              <motion.svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                className="w-7 h-7 text-gray-800 dark:text-gray-300"
+              <motion.div
                 animate={{ rotate: 180 }}
                 transition={{ duration: 0.5 }}
+                className="inline-block"
               >
-                <path d="M20.354 15.354A9 9 0 1111.646 6.646a7 7 0 009.708 8.708z" />
-              </motion.svg>
+                <FaMoon className="w-6 h-6" />
+              </motion.div>
             )}
           </button>
         </div>
       </motion.nav>
 
-      {/* Side Menu */}
+      {/* FLOATING BUTTON (MOBILE) */}
+      <button
+        onClick={toggleMenu}
+        className="fixed bottom-5 right-5 flex items-center justify-center 
+                   w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 
+                   text-white shadow-lg hover:scale-105 transition-transform 
+                   md:hidden z-50"
+        aria-label="Open Menu (Floating Button)"
+      >
+        {isMenuOpen ? (
+          <FaTimes />
+        ) : (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            className="w-6 h-6"
+          >
+            <path d="M4 6h16M4 12h16M4 18h16" strokeWidth="2" />
+          </svg>
+        )}
+      </button>
+
+      {/* SIDE MENU (MOBILE) */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
             <motion.div
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ duration: 0.3 }}
-              className="fixed top-0 left-0 h-full w-64 bg-white dark:bg-[#374151] shadow-xl rounded-r-lg z-50"
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ duration: 0.4 }}
+              className="fixed bottom-0 left-0 h-full w-64 bg-white dark:bg-[#374151] 
+                         shadow-xl rounded-t-lg z-40 flex flex-col"
             >
-              <ul className="flex flex-col mt-8">
-                {menuItems.map((item) => (
-                  <motion.li
-                    key={item.name}
-                    whileHover={{ scale: 1.02 }}
-                    className="w-full mb-4"
-                  >
-                    <Link
-                      href={item.path}
-                      className="block w-full px-6 py-4 text-lg font-medium text-gray-800 dark:text-[#D1D5DB] hover:bg-gray-100 dark:hover:bg-[#4B5563] rounded-lg transition-all"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {item.name}
-                    </Link>
-                  </motion.li>
-                ))}
+              {/* Mobile Search inside side menu */}
+              <div className="px-6 mt-4">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  placeholder="Search..."
+                  className="w-full px-2 py-1 mb-4 text-sm text-gray-800 
+                             dark:text-gray-300 bg-gray-100 
+                             dark:bg-[#2D3748] rounded-md focus:outline-none 
+                             focus:ring focus:ring-blue-400"
+                />
+              </div>
+              {/* Close side menu */}
+              <button
+                onClick={toggleMenu}
+                className="self-end mt-4 mr-4 text-gray-800 dark:text-gray-100 
+                           hover:scale-110 transition-transform"
+                aria-label="Close menu"
+              >
+                <FaTimes className="w-6 h-6" />
+              </button>
+              {/* Filtered nav items */}
+              <ul className="mt-4">
+                {filteredMenuItems.map((item) => {
+                  const isActive = pathname === item.path;
+                  return (
+                    <motion.li key={item.name} whileHover={{ scale: 1.02 }} className="mb-4">
+                      <Link
+                        href={item.path}
+                        aria-label={`Go to ${item.name}`}
+                        className={`relative block px-6 py-3 text-lg font-medium 
+                                   text-gray-800 dark:text-[#D1D5DB] 
+                                   rounded-r-lg hover:bg-gray-100 
+                                   dark:hover:bg-[#4B5563] transition-all 
+                                   ${
+                                     isActive
+                                       ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white"
+                                       : ""
+                                   }`}
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {item.icon}
+                        {item.name}
+                      </Link>
+                    </motion.li>
+                  );
+                })}
               </ul>
             </motion.div>
 
-            {/* Backdrop */}
+            {/* Backdrop for side menu */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.5 }}
               exit={{ opacity: 0 }}
-              className="fixed top-0 left-0 w-full h-full bg-black z-40"
+              className="fixed top-0 left-0 w-full h-full bg-black z-30"
               onClick={toggleMenu}
+              aria-label="Close menu backdrop"
             />
           </>
         )}

@@ -29,7 +29,7 @@ export default function Footer() {
           </a>
         </div>
         <p className="text-sm text-gray-600 dark:text-gray-500">
-          &copy; 2024 My Portfolio. All rights reserved.
+          &copy; 2025 My Portfolio. All rights reserved.
         </p>
       </div>
     </footer>
