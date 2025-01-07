@@ -264,7 +264,7 @@ export default function Navbar() {
         )}
       </button>
 
-      {/* SIDE MENU (MOBILE) */}
+      {/* BOTTOM SHEET MENU (MOBILE) */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
@@ -273,10 +273,10 @@ export default function Navbar() {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ duration: 0.4 }}
-              className="fixed bottom-0 left-0 h-full w-64 bg-white dark:bg-[#374151] 
+              className="fixed bottom-0 left-0 w-full bg-white dark:bg-[#374151] 
                          shadow-xl rounded-t-lg z-40 flex flex-col"
             >
-              {/* Mobile Search inside side menu */}
+              {/* Mobile Search inside bottom sheet */}
               <div className="px-6 mt-4">
                 <input
                   type="text"
@@ -289,7 +289,7 @@ export default function Navbar() {
                              focus:ring focus:ring-blue-400"
                 />
               </div>
-              {/* Close side menu */}
+              {/* Close bottom sheet */}
               <button
                 onClick={toggleMenu}
                 className="self-end mt-4 mr-4 text-gray-800 dark:text-gray-100 
@@ -327,7 +327,7 @@ export default function Navbar() {
               </ul>
             </motion.div>
 
-            {/* Backdrop for side menu */}
+            {/* Backdrop for bottom sheet */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.5 }}
