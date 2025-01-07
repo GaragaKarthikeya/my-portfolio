@@ -18,22 +18,20 @@ export default function Projects() {
 
       {/* Projects Grid */}
       <motion.div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl"
+        /* Removed whileInView & viewport so it’s always rendered */
+        className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl"
         initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
+        animate="visible"
         variants={{
-          hidden: { opacity: 0, y: 50 },
+          hidden: {},
           visible: {
-            opacity: 1,
-            y: 0,
             transition: { staggerChildren: 0.2 },
           },
         }}
       >
-        {projects.map((project, index) => (
+        {projects.map((project) => (
           <motion.div
-            key={index}
+            key={project.title} // Make sure 'title' is unique, otherwise use an 'id'
             variants={{
               hidden: { opacity: 0, y: 20 },
               visible: { opacity: 1, y: 0 },
