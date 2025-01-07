@@ -79,13 +79,19 @@ export default function Navbar() {
   const filteredMenuItems = menuItems.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+// --------------------
+// HANDLERS
+// --------------------
+const toggleMenu = () => setIsMenuOpen((prev) => !prev);
 
-  // --------------------
-  // HANDLERS
-  // --------------------
-  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
-  const handleLanguageChange = (e) => setLanguage(e.target.value);
-  const handleSearchChange = (e) => setSearchQuery(e.target.value);
+const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  setLanguage(e.target.value);
+};
+
+const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  setSearchQuery(e.target.value);
+};
+
 
   // --------------------
   // MOUNTING EFFECT
