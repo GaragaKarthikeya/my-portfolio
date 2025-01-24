@@ -11,7 +11,7 @@ const ease = "easeOut";
 export default function Home() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false); // Loading state for subscription
-  const form = useRef();
+  const form = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
