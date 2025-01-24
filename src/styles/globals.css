@@ -1,128 +1,172 @@
-/* Tailwind CSS Directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Global Reset */
-* {
+/* Custom Utilities */
+@layer utilities {
+  .ease-custom {
+    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+}
+
+/* Hover Effects */
+.hover-scale {
+  @apply transition-transform duration-300 ease-custom;
+  transform: translateZ(0);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02) translateZ(0);
+}
+
+/* Modern Reset */
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
-html,
+/* Base HTML styles */
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  text-size-adjust: 100%;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+  scrollbar-width: thin;
+}
+
+/* Body styles */
 body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
+  @apply bg-background text-foreground font-sans antialiased;
+  line-height: 1.6;
   overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 100vh;
 }
 
 /* Color Variables */
 :root {
-  --background: 255 255 255;
-  --foreground: 23 23 23;
-  --border-light: 229 229 229;
-  --border-dark: 38 38 38;
+  --background: 250, 250, 250;
+  --foreground: 23, 23, 23;
+  --background-dark: 17, 24, 39;
+  --foreground-dark: 229, 231, 235;
+  --border-light: 226, 232, 240;
+  --border-dark: 55, 65, 81;
 }
 
 .dark {
-  --background: 10 10 10;
-  --foreground: 237 237 237;
-}
-
-/* Base Styles */
-body {
-  color: rgb(var(--foreground));
-  background-color: rgb(var(--background));
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Glassmorphism Base */
-.glass-container {
-  background: rgba(var(--background), 0.65);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(var(--foreground), 0.12);
-}
-
-/* Animations */
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes shine {
-  to { background-position: 200% center; }
-}
-
-@keyframes gradient-border {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.animate-fade-in {
-  animation: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.gradient-shine {
-  background: linear-gradient(
-    to right,
-    rgb(59 130 246) 20%,
-    rgb(99 102 241) 40%,
-    rgb(99 102 241) 60%,
-    rgb(59 130 246) 80%
-  );
-  background-size: 200% auto;
-  animation: shine 3s linear infinite;
-}
-
-.theme-transition * {
-  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-              color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --background: var(--background-dark);
+  --foreground: var(--foreground-dark);
+  --border-light: var(--border-dark);
 }
 
 /* Scrollbar Styles */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+@media (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.5);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: background-color 0.3s, transform 0.2s;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(156, 163, 175, 0.7);
+    transform: scale(1.1);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: rgba(var(--foreground), 0.05);
-  border-radius: 4px;
+/* Glassmorphism Effect */
+.glass-container {
+  position: relative;
+  overflow: hidden;
+  background: rgba(var(--background), 0.72);
+  border: 1px solid rgba(var(--foreground), 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(var(--foreground), 0.2);
-  border-radius: 4px;
-  transition: background 0.3s ease;
+@supports (backdrop-filter: blur(1px)) {
+  .glass-container {
+    backdrop-filter: blur(24px) saturate(200%);
+    background: rgba(var(--background), 0.65);
+  }
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(var(--foreground), 0.3);
+.glass-container::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  background: radial-gradient(
+    200px circle at var(--x, 50%) var(--y, 50%),
+    rgba(var(--primary-accent), 0.12) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
 }
 
-/* Selection Styles */
-::selection {
-  background: rgba(59, 130, 246, 0.3);
-  color: rgb(var(--foreground));
-}
-
-/* Gradient Border Animation */
+/* Gradient Border */
 .animated-border {
   position: relative;
+  background: transparent;
+  border-radius: 0.75rem;
+}
+
+.animated-border::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  z-index: 0;
   background: linear-gradient(
     45deg,
-    rgb(59 130 246),
-    rgb(168 85 247),
-    rgb(59 130 246)
+    theme(colors.gradient.start),
+    theme(colors.gradient.middle),
+    theme(colors.gradient.end)
   );
-  background-size: 200% 200%;
-  animation: gradient-border 5s ease infinite;
+  background-size: 300% 300%;
+  animation: gradient-border 8s ease infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* Skeleton Loading */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(var(--border-light), 0.2);
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 75%
+  );
+  animation: skeleton 1.5s infinite;
+  transform: translateX(-100%);
 }
