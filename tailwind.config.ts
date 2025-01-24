@@ -31,7 +31,6 @@ export default {
     },
   },
   plugins: [
-    require("@tailwindcss/line-clamp"), // Line clamping for text
     require("@tailwindcss/forms"), // Clean form styling
     require("@tailwindcss/aspect-ratio"), // Maintain image aspect ratios
   ],

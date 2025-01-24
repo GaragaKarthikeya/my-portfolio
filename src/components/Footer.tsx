@@ -73,12 +73,16 @@ export default function Footer() {
     }
 
     try {
-      const result = await emailjs.sendForm(
+      await emailjs.sendForm(
         process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
         process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
         form.current,
         process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
-      );
+      ).then((_result) => {
+        // Using an underscore to avoid lint warning for unused variable
+        console.log(_result.text);
+        alert("Thank you for subscribing!");
+      });
 
       // Update local storage with new email
       const updatedEmails = new Set([...submittedEmails, email]);
@@ -99,12 +103,14 @@ export default function Footer() {
 
       trackAnalyticsEvent('newsletter_subscription');
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('EmailJS Error:', error);
       setState({
         isLoading: false,
         isSuccess: false,
-        error: error.text || "Subscription failed. Please try again.",
+        error: error instanceof Error
+          ? error.message
+          : "Subscription failed. Please try again.",
         successMessage: null,
       });
     }
@@ -284,75 +290,89 @@ export default function Footer() {
 }
 
 // Social Link Component
-const SocialLink = memo(({ href, children, label }: { 
+const SocialLink = memo(function SocialLink({ href, children, label }: { 
   href: string, 
   children: React.ReactNode,
   label: string 
-}) => (
-  <motion.a
-    href={href}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="p-2 rounded-lg dark:hover:bg-gray-700"
-    aria-label={label}
-    whileHover={{ 
-      scale: 1.1,
-      backgroundColor: '#f3f4f6',
-      transition: { type: 'spring', stiffness: 300 }
-    }}
-    whileTap={{ scale: 0.9 }}
-  >
-    <motion.span
-      whileHover={{
-        rotateY: 10,
-        rotateX: -5,
-        transition: { type: 'spring' }
+}) {
+  return (
+    <motion.a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="p-2 rounded-lg dark:hover:bg-gray-700"
+      aria-label={label}
+      whileHover={{ 
+        scale: 1.1,
+        backgroundColor: '#f3f4f6',
+        transition: { type: 'spring', stiffness: 300 }
       }}
-      className="w-6 h-6 block text-gray-700 dark:text-gray-300"
+      whileTap={{ scale: 0.9 }}
     >
-      {children}
-    </motion.span>
-  </motion.a>
-));
+      <motion.span
+        whileHover={{
+          rotateY: 10,
+          rotateX: -5,
+          transition: { type: 'spring' }
+        }}
+        className="w-6 h-6 block text-gray-700 dark:text-gray-300"
+      >
+        {children}
+      </motion.span>
+    </motion.a>
+  );
+});
+SocialLink.displayName = 'SocialLink';
 
-// Icons
-const GitHubIcon = memo(() => (
-  <svg fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
-    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.253-4.555-1.113-4.555-4.951 0-1.305.465-2.385 1.23-3.225-.12-.253-.446-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.92 1.23 3.225 0 3.848-2.805 4.695-5.475 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
-  </svg>
-));
+const GitHubIcon = memo(function GitHubIcon() {
+  return (
+    <svg fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.253-4.555-1.113-4.555-4.951 0-1.305.465-2.385 1.23-3.225-.12-.253-.446-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.92 1.23 3.225 0 3.848-2.805 4.695-5.475 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+    </svg>
+  );
+});
+GitHubIcon.displayName = 'GitHubIcon';
 
-const LinkedInIcon = memo(() => (
-  <svg fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
-    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-  </svg>
-));
+const LinkedInIcon = memo(function LinkedInIcon() {
+  return (
+    <svg fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
+      <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+    </svg>
+  );
+});
+LinkedInIcon.displayName = 'LinkedInIcon';
 
-const EmailIcon = memo(() => (
-  <svg fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
-    <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/>
-  </svg>
-));
+const EmailIcon = memo(function EmailIcon() {
+  return (
+    <svg fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
+      <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/>
+    </svg>
+  );
+});
+EmailIcon.displayName = 'EmailIcon';
 
-const SpinnerIcon = memo(() => (
-  <svg
-    className="animate-spin h-4 w-4 text-white"
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-  >
-    <circle
-      className="opacity-25"
-      cx="12"
-      cy="12"
-      r="10"
-      stroke="currentColor"
-      strokeWidth="4"
-    />
-    <path
-      className="opacity-75"
-      fill="currentColor"
-      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-    />
-  </svg>
-));
+const SpinnerIcon = memo(function SpinnerIcon() {
+  return (
+    <svg
+      className="animate-spin h-4 w-4 text-white"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      />
+    </svg>
+  );
+});
+SpinnerIcon.displayName = 'SpinnerIcon';
