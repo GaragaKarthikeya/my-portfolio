@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
@@ -23,7 +23,7 @@ export default function Navbar() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const pathname = usePathname();
   const [playHover] = useSound("/sounds/hover.mp3", { volume: 0.25 });
-  const [playClick] = useSound("/sounds/click.mp3", { volume: 0.3 });
+  const hoverTimeout = useRef(null);
 
   // --------------------
   // THEME MANAGEMENT
@@ -39,7 +39,6 @@ export default function Navbar() {
   }, []);
 
   const toggleTheme = () => {
-    playClick();
     setIsDarkMode((prev) => {
       document.documentElement.classList.toggle("dark", !prev);
       localStorage.setItem("theme", !prev ? "dark" : "light");
@@ -99,7 +98,12 @@ export default function Navbar() {
               <motion.li 
                 key={item.name}
                 whileHover={{ scale: 1.05 }}
-                onHoverStart={playHover}
+                onHoverStart={() => {
+                  hoverTimeout.current = setTimeout(() => playHover(), 200);
+                }}
+                onHoverEnd={() => {
+                  clearTimeout(hoverTimeout.current);
+                }}
               >
                 <Link
                   href={item.path}
@@ -116,11 +120,18 @@ export default function Navbar() {
             ))}
 
             {/* CONTACT BUTTON */}
-            <motion.li whileHover={{ scale: 1.05 }}>
+            <motion.li 
+              whileHover={{ scale: 1.05 }}
+              onHoverStart={() => {
+                hoverTimeout.current = setTimeout(() => playHover(), 200);
+              }}
+              onHoverEnd={() => {
+                clearTimeout(hoverTimeout.current);
+              }}
+            >
               <Link
                 href="/contact"
                 className="px-4 py-2 rounded-md flex items-center bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg hover:opacity-90"
-                onClick={playClick}
               >
                 <span className="mr-2">📬</span>
                 Contact Me
