@@ -24,36 +24,26 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const [playHover] = useSound("/sounds/hover.mp3", { volume: 0.25 });
-  const hoverTimeout = useRef(null);
-  const navRef = useRef(null);
+  const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const navRef = useRef<HTMLDivElement>(null);
 
   // --------------------
-  // THEME MANAGEMENT
+  // THEME & SCROLL MANAGEMENT
   // --------------------
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const initialTheme = savedTheme ? savedTheme === "dark" : systemDark;
-
+    
     setIsDarkMode(initialTheme);
     document.documentElement.classList.toggle("dark", initialTheme);
     setMounted(true);
-  }, []);
 
-  // --------------------
-  // SCROLL MANAGEMENT
-  // --------------------
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // --------------------
-  // THEME TOGGLE
-  // --------------------
   const toggleTheme = () => {
     setIsDarkMode((prev) => {
       const newMode = !prev;
@@ -121,7 +111,10 @@ export default function Navbar() {
                     hoverTimeout.current = setTimeout(() => playHover(), 200);
                   }}
                   onHoverEnd={() => {
-                    clearTimeout(hoverTimeout.current);
+                    if (hoverTimeout.current) {
+                      clearTimeout(hoverTimeout.current);
+                      hoverTimeout.current = null;
+                    }
                   }}
                   className="relative"
                 >
@@ -154,7 +147,10 @@ export default function Navbar() {
                   hoverTimeout.current = setTimeout(() => playHover(), 200);
                 }}
                 onHoverEnd={() => {
-                  clearTimeout(hoverTimeout.current);
+                  if (hoverTimeout.current) {
+                    clearTimeout(hoverTimeout.current);
+                    hoverTimeout.current = null;
+                  }
                 }}
               >
                 <Link
@@ -280,18 +276,6 @@ export default function Navbar() {
           </>
         )}
       </AnimatePresence>
-
-      {/* SCROLL PROGRESS INDICATOR */}
-      <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 z-50"
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: isScrolled ? 1 : 0 }}
-        transition={{ duration: 0.3 }}
-        style={{ 
-          transformOrigin: 'left center',
-          scaleX: isScrolled ? window.scrollY / (document.body.scrollHeight - window.innerHeight) : 0
-        }}
-      />
     </>
   );
 }

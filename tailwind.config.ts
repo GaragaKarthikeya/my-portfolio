@@ -11,21 +11,19 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Base color definitions
         background: {
-          DEFAULT: "#f9fafb", // Light mode default
-          dark: "#1f2937",    // Dark mode default
+          DEFAULT: "rgb(var(--background) / <alpha-value>)",
+          dark: "rgb(var(--background) / <alpha-value>)",
         },
         foreground: {
-          DEFAULT: "#1f2937", // Light mode text
-          dark: "#f9fafb",    // Dark mode text
+          DEFAULT: "rgb(var(--foreground) / <alpha-value>)",
+          dark: "rgb(var(--foreground) / <alpha-value>)",
         },
         primary: {
-          DEFAULT: "#3b82f6", // Light primary
-          dark: "#2563eb",    // Dark primary
-          accent: "#60a5fa",  // Primary accent
+          DEFAULT: "#3b82f6",
+          dark: "#2563eb",
+          accent: "#60a5fa",
         },
-        // Additional theme colors
         secondary: {
           DEFAULT: "#4f46e5", 
           dark: "#4338ca",
@@ -34,31 +32,61 @@ export default {
           DEFAULT: "#6b7280",
           dark: "#9ca3af",
         },
-        // Gradient colors
         gradient: {
-          start: "#3b82f6",   // Primary
-          middle: "#8b5cf6",  // Purple
-          end: "#ec4899",     // Pink
+          start: "#3b82f6",
+          middle: "#8b5cf6",
+          end: "#ec4899",
         }
       },
       borderRadius: {
         lg: "12px",
         xl: "16px",
       },
-      // Animation extensions
+      backdropBlur: {
+        '3xl': '48px',
+      },
+      backgroundOpacity: {
+        15: '0.15',
+        40: '0.4',
+        70: '0.7',
+        80: '0.8',
+        90: '0.9',
+        95: '0.95',
+      },
+      borderOpacity: {
+        10: '0.1',
+        20: '0.2',
+        30: '0.3',
+        40: '0.4',
+      },
       animation: {
         "progress-bar": "progress 2s linear infinite",
+        "gradient-border": "gradient-border 5s ease infinite",
+        "shine": "shine 3s linear infinite",
       },
       keyframes: {
         progress: {
           "0%": { width: "0%" },
           "100%": { width: "100%" },
         },
+        "gradient-border": {
+          "0%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+          "100%": { backgroundPosition: "0% 50%" },
+        },
+        shine: {
+          to: { backgroundPosition: "200% center" },
+        },
+      },
+      boxShadow: {
+        glass: "0 4px 30px rgba(0, 0, 0, 0.1)",
+        "inner-lg": "inset 0 2px 4px 0 rgb(0 0 0 / 0.05)",
       },
     },
   },
   plugins: [
     require("@tailwindcss/forms"),
     require("@tailwindcss/aspect-ratio"),
+    require("tailwindcss-animate"),
   ],
 } satisfies Config;
