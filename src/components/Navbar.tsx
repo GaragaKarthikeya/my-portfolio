@@ -19,27 +19,48 @@ export default function Navbar() {
   // --------------------
   // STATE & CONSTANTS
   // --------------------
-  const [mounted, setMounted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number }>>([]);
   const pathname = usePathname();
-  const [playHover] = useSound("/sounds/hover.mp3", { volume: 0.25 });
   const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const themeButtonRef = useRef<HTMLButtonElement>(null);
+  const [playHover] = useSound("/sounds/hover.mp3", { volume: 0.25 });
+  const [playToggle] = useSound("/sounds/toggle.mp3", { volume: 0.3 });
+  const particleId = useRef(0);
 
   // --------------------
   // THEME MANAGEMENT
   // --------------------
   useEffect(() => {
+    setMounted(true);
     const savedTheme = localStorage.getItem("theme");
     const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const initialTheme = savedTheme ? savedTheme === "dark" : systemDark;
-
+    
     setIsDarkMode(initialTheme);
     document.documentElement.classList.toggle("dark", initialTheme);
-    setMounted(true);
+
+    return () => setMounted(false);
   }, []);
 
-  const toggleTheme = () => {
+  const createParticles = (x: number, y: number) => {
+    const newParticles = Array.from({ length: 8 }).map((_, i) => ({
+      id: particleId.current++,
+      x: x + Math.random() * 20 - 10,
+      y: y + Math.random() * 20 - 10,
+    }));
+    setParticles((prev) => [...prev, ...newParticles]);
+  };
+
+  const toggleTheme = (e: React.MouseEvent) => {
+    playToggle();
+    const rect = themeButtonRef.current?.getBoundingClientRect();
+    if (rect) {
+      createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    }
+
     setIsDarkMode((prev) => {
       const newMode = !prev;
       document.documentElement.classList.toggle("dark", newMode);
@@ -63,32 +84,79 @@ export default function Navbar() {
 
   return (
     <>
+      {/* ANIMATED PARTICLES */}
+      <AnimatePresence>
+        {particles.map((particle) => (
+          <motion.div
+            key={particle.id}
+            initial={{
+              scale: 1,
+              opacity: 1,
+              x: particle.x,
+              y: particle.y,
+            }}
+            animate={{
+              x: particle.x + (Math.random() - 0.5) * 100,
+              y: particle.y - 100,
+              scale: 0,
+              opacity: 0,
+            }}
+            transition={{
+              duration: 1.5,
+              ease: "easeOut",
+            }}
+            className="fixed pointer-events-none z-[999] w-2 h-2 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 dark:from-blue-400 dark:to-purple-400"
+            onAnimationComplete={() => {
+              setParticles((prev) => prev.filter((p) => p.id !== particle.id));
+            }}
+          />
+        ))}
+      </AnimatePresence>
+
       {/* MAIN NAVBAR */}
       <motion.nav
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="fixed top-0 inset-x-0 z-50 bg-gray-100 dark:bg-gray-900 backdrop-blur-lg border-b border-gray-200/20 dark:border-gray-800/30 shadow-sm"
+        className="fixed top-0 inset-x-0 z-50 bg-gray-100/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200/20 dark:border-gray-800/30 shadow-sm"
+        suppressHydrationWarning
       >
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between relative">
           {/* MOBILE THEME TOGGLE */}
           <div className="md:hidden flex items-center">
-            <button
+            <motion.button
+              ref={themeButtonRef}
               onClick={toggleTheme}
-              className="p-2 rounded-full backdrop-blur-sm bg-gray-200/30 dark:bg-gray-800/30 border border-gray-300/20 dark:border-gray-700/30 hover:scale-110 transition-transform"
+              className="p-2 rounded-full backdrop-blur-sm bg-gray-200/30 dark:bg-gray-800/30 border border-gray-300/20 dark:border-gray-700/30 relative overflow-hidden"
               aria-label={`Switch to ${isDarkMode ? "light" : "dark"} mode`}
+              whileTap={{ scale: 0.9 }}
+              transition={{ type: "spring", stiffness: 300, damping: 10 }}
             >
-              {isDarkMode ? (
-                <motion.div animate={{ rotate: 360 }} transition={{ duration: 0.5 }}>
-                  <FaSun className="text-yellow-400 w-6 h-6" />
-                </motion.div>
-              ) : (
-                <motion.div animate={{ rotate: 180 }} transition={{ duration: 0.5 }}>
-                  <FaMoon className="w-6 h-6 text-gray-800 dark:text-gray-300" />
-                </motion.div>
-              )}
-            </button>
+              <AnimatePresence mode="wait">
+                {isDarkMode ? (
+                  <motion.div
+                    key="sun"
+                    initial={{ rotate: -180, scale: 0 }}
+                    animate={{ rotate: 0, scale: 1 }}
+                    exit={{ rotate: 180, scale: 0 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    <FaSun className="text-yellow-400 w-6 h-6" />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="moon"
+                    initial={{ rotate: 180, scale: 0 }}
+                    animate={{ rotate: 0, scale: 1 }}
+                    exit={{ rotate: -180, scale: 0 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    <FaMoon className="w-6 h-6 text-gray-800 dark:text-gray-300" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-400/20 dark:from-blue-400/20 dark:to-purple-400/20 opacity-0 hover:opacity-100 transition-opacity rounded-full" />
+            </motion.button>
           </div>
 
           {/* DESKTOP MENU */}
@@ -101,22 +169,28 @@ export default function Navbar() {
                   hoverTimeout.current = setTimeout(() => playHover(), 200);
                 }}
                 onHoverEnd={() => {
-                  if (hoverTimeout.current) {
-                    clearTimeout(hoverTimeout.current);
-                    hoverTimeout.current = null;
-                  }
+                  hoverTimeout.current && clearTimeout(hoverTimeout.current);
                 }}
+                className="relative"
               >
                 <Link
                   href={item.path}
-                  className={`px-4 py-2 rounded-md flex items-center transition-all ${
+                  className={`px-4 py-2 rounded-md flex items-center transition-all relative overflow-hidden group ${
                     pathname === item.path
                       ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg"
                       : "text-gray-800 dark:text-gray-300 hover:bg-gray-200/30 dark:hover:bg-gray-700/30 backdrop-blur-sm border border-gray-300/20 dark:border-gray-600/20"
                   }`}
                 >
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-md" />
                   {item.icon}
                   {item.name}
+                  {pathname === item.path && (
+                    <motion.div 
+                      layoutId="activeIndicator"
+                      className="absolute inset-0 bg-white/20 dark:bg-black/20 rounded-md"
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    />
+                  )}
                 </Link>
               </motion.li>
             ))}
@@ -126,47 +200,67 @@ export default function Navbar() {
           <div className="flex items-center space-x-4">
             {/* MOBILE MENU TOGGLE */}
             <div className="md:hidden flex items-center justify-end flex-1">
-              <button
+              <motion.button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 rounded-lg hover:bg-gray-200/30 dark:hover:bg-gray-700/30 backdrop-blur-sm border border-gray-300/20 dark:border-gray-600/20 relative z-50"
+                className="p-2 rounded-lg hover:bg-gray-200/30 dark:hover:bg-gray-700/30 backdrop-blur-sm border border-gray-300/20 dark:border-gray-600/20 relative z-50 group"
                 aria-label="Toggle menu"
+                whileHover={{ scale: 1.1 }}
               >
                 {isMenuOpen ? (
                   <FaTimes className="w-6 h-6 text-gray-800 dark:text-gray-300" />
                 ) : (
                   <div className="space-y-1">
-                    <span className="block w-6 h-0.5 bg-gray-800 dark:bg-gray-300 rounded-full"></span>
-                    <span className="block w-6 h-0.5 bg-gray-800 dark:bg-gray-300 rounded-full"></span>
-                    <span className="block w-6 h-0.5 bg-gray-800 dark:bg-gray-300 rounded-full"></span>
+                    <span className="block w-6 h-0.5 bg-gray-800 dark:bg-gray-300 rounded-full transition-transform" />
+                    <span className="block w-6 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 dark:from-blue-300 dark:to-purple-300 rounded-full transition-transform" />
+                    <span className="block w-6 h-0.5 bg-gray-800 dark:bg-gray-300 rounded-full transition-transform" />
                   </div>
                 )}
-              </button>
+              </motion.button>
             </div>
 
             {/* DESKTOP THEME TOGGLE */}
             <div className="hidden md:flex items-center">
-              <button
+              <motion.button
+                ref={themeButtonRef}
                 onClick={toggleTheme}
-                className="p-2 rounded-full backdrop-blur-sm bg-gray-200/30 dark:bg-gray-800/30 border border-gray-300/20 dark:border-gray-700/30 hover:scale-110 transition-transform"
+                className="p-2 rounded-full backdrop-blur-sm bg-gray-200/30 dark:bg-gray-800/30 border border-gray-300/20 dark:border-gray-700/30 relative overflow-hidden group"
                 aria-label={`Switch to ${isDarkMode ? "light" : "dark"} mode`}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 300, damping: 10 }}
               >
-                {isDarkMode ? (
-                  <motion.div animate={{ rotate: 360 }} transition={{ duration: 0.5 }}>
-                    <FaSun className="text-yellow-400 w-6 h-6" />
-                  </motion.div>
-                ) : (
-                  <motion.div animate={{ rotate: 180 }} transition={{ duration: 0.5 }}>
-                    <FaMoon className="w-6 h-6 text-gray-800 dark:text-gray-300" />
-                  </motion.div>
-                )}
-              </button>
+                <AnimatePresence mode="wait">
+                  {isDarkMode ? (
+                    <motion.div
+                      key="sun"
+                      initial={{ rotate: -180, scale: 0 }}
+                      animate={{ rotate: 0, scale: 1 }}
+                      exit={{ rotate: 180, scale: 0 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <FaSun className="text-yellow-400 w-6 h-6" />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="moon"
+                      initial={{ rotate: 180, scale: 0 }}
+                      animate={{ rotate: 0, scale: 1 }}
+                      exit={{ rotate: -180, scale: 0 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <FaMoon className="w-6 h-6 text-gray-800 dark:text-gray-300" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-400/20 dark:from-blue-400/20 dark:to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-full" />
+              </motion.button>
             </div>
           </div>
         </div>
       </motion.nav>
 
       {/* MOBILE MENU */}
-      <AnimatePresence>
+      <AnimatePresence initial={false}>
         {isMenuOpen && (
           <>
             <motion.div
@@ -194,13 +288,14 @@ export default function Navbar() {
                   >
                     <Link
                       href={item.path}
-                      className={`flex items-center px-4 py-2 rounded-md ${
+                      className={`flex items-center px-4 py-2 rounded-md relative overflow-hidden ${
                         pathname === item.path
                           ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white"
                           : "text-gray-800 dark:text-gray-300 hover:bg-gray-200/30 dark:hover:bg-gray-700/30"
                       }`}
                       onClick={() => setIsMenuOpen(false)}
                     >
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 opacity-0 hover:opacity-100 transition-opacity rounded-md" />
                       {item.icon}
                       {item.name}
                     </Link>
