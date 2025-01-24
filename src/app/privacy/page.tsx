@@ -38,9 +38,15 @@ export default function PrivacyPolicy() {
               I may collect the following types of information:
             </p>
             <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
-              <li><strong>Personal Information:</strong> Such as your name and email address, if you choose to contact me or subscribe to my newsletter.</li>
-              <li><strong>Usage Data:</strong> Information about how you interact with my website, including your IP address, browser type, and pages visited.</li>
-              <li><strong>Cookies:</strong> Small data files stored on your device to enhance your browsing experience.</li>
+              <li className="rounded-xl p-2">
+                <strong>Personal Information:</strong> Such as your name and email address, if you choose to contact me or subscribe to my newsletter.
+              </li>
+              <li className="rounded-xl p-2">
+                <strong>Usage Data:</strong> Information about how you interact with my website, including your IP address, browser type, and pages visited.
+              </li>
+              <li className="rounded-xl p-2">
+                <strong>Cookies:</strong> Small data files stored on your device to enhance your browsing experience.
+              </li>
             </ul>
           </section>
 
@@ -48,13 +54,10 @@ export default function PrivacyPolicy() {
             <h2 className="text-3xl font-bold mb-4 border-b border-gray-400 dark:border-gray-600 pb-2">
               3. How I Use Your Information
             </h2>
-            <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
-              I use the information I collect for the following purposes:
-            </p>
             <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
-              <li>To respond to your inquiries or requests.</li>
-              <li>To send you updates or newsletters, if you have subscribed.</li>
-              <li>To analyze website traffic and improve user experience.</li>
+              <li className="rounded-xl p-2">To respond to your inquiries or requests.</li>
+              <li className="rounded-xl p-2">To send you updates or newsletters, if you have subscribed.</li>
+              <li className="rounded-xl p-2">To analyze website traffic and improve user experience.</li>
             </ul>
           </section>
 
@@ -80,13 +83,10 @@ export default function PrivacyPolicy() {
             <h2 className="text-3xl font-bold mb-4 border-b border-gray-400 dark:border-gray-600 pb-2">
               6. Your Rights
             </h2>
-            <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
-              You have the right to:
-            </p>
             <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
-              <li>Access, update, or delete your personal information.</li>
-              <li>Opt out of receiving communications from me.</li>
-              <li>Request details about how your data is being used.</li>
+              <li className="rounded-xl p-2">Access, update, or delete your personal information.</li>
+              <li className="rounded-xl p-2">Opt out of receiving communications from me.</li>
+              <li className="rounded-xl p-2">Request details about how your data is being used.</li>
             </ul>
           </section>
 
@@ -106,11 +106,10 @@ export default function PrivacyPolicy() {
             <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
               If you have any questions about this Privacy Policy, please contact me at:
             </p>
-            <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
-              <strong>Email:</strong>{" "}
+            <p className="mt-4">
               <a
                 href="mailto:Garaga.Karthikeya@iiitb.ac.in"
-                className="text-blue-500 dark:text-blue-400 hover:underline"
+                className="text-blue-500 dark:text-blue-400 hover:underline text-lg"
               >
                 Garaga.Karthikeya@iiitb.ac.in
               </a>

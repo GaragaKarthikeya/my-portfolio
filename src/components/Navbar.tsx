@@ -72,14 +72,14 @@ export default function Navbar() {
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="fixed top-0 inset-x-0 z-50 bg-white dark:bg-gray-800 shadow-md"
+        className="fixed top-0 inset-x-0 z-50 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-b border-white/20 dark:border-gray-700/30 shadow-xl shadow-gray-200/20 dark:shadow-gray-900/30"
       >
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           {/* LEFT SIDE - THEME TOGGLE (MOBILE) */}
           <div className="md:hidden flex items-center">
             <button
               onClick={toggleTheme}
-              className="hover:scale-110 transition-transform"
+              className="hover:scale-110 transition-transform p-2 rounded-full backdrop-blur-sm bg-white/30 dark:bg-gray-800/30 border border-white/10 dark:border-gray-600/20"
               aria-label={`Switch to ${isDarkMode ? "light" : "dark"} mode`}
             >
               {isDarkMode ? (
@@ -108,10 +108,10 @@ export default function Navbar() {
                 <li key={item.name}>
                   <Link
                     href={item.path}
-                    className={`flex items-center px-4 py-2 rounded-md transition-colors ${
+                    className={`flex items-center px-4 py-2 rounded-md transition-all ${
                       isActive
-                        ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white"
-                        : "text-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        ? "bg-gradient-to-r from-blue-500/90 to-indigo-500/90 text-white shadow-lg shadow-blue-500/30"
+                        : "text-gray-800 dark:text-gray-300 hover:bg-white/30 dark:hover:bg-gray-700/30 backdrop-blur-sm border border-white/20 dark:border-gray-600/20"
                     }`}
                   >
                     {item.icon}
@@ -125,7 +125,7 @@ export default function Navbar() {
             <li>
               <Link
                 href="/contact"
-                className="flex items-center px-4 py-2 rounded-md text-white bg-gradient-to-r from-blue-500 to-indigo-500 hover:opacity-90"
+                className="flex items-center px-4 py-2 rounded-md text-white bg-gradient-to-r from-blue-500/90 to-indigo-500/90 hover:opacity-90 shadow-lg shadow-blue-500/30 backdrop-blur-sm"
               >
                 <span className="mr-2">📬</span>
                 Contact Me
@@ -137,7 +137,7 @@ export default function Navbar() {
           <div className="md:hidden flex items-center justify-end flex-1">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 relative z-50"
+              className="p-2 rounded-lg hover:bg-white/30 dark:hover:bg-gray-700/30 backdrop-blur-sm border border-white/20 dark:border-gray-600/20 relative z-50"
               aria-label="Toggle menu"
             >
               {isMenuOpen ? (
@@ -156,7 +156,7 @@ export default function Navbar() {
           <div className="hidden md:flex items-center">
             <button
               onClick={toggleTheme}
-              className="hover:scale-110 transition-transform"
+              className="hover:scale-110 transition-transform p-2 rounded-full backdrop-blur-sm bg-white/30 dark:bg-gray-800/30 border border-white/10 dark:border-gray-600/20"
               aria-label={`Switch to ${isDarkMode ? "light" : "dark"} mode`}
             >
               {isDarkMode ? (
@@ -185,9 +185,9 @@ export default function Navbar() {
           <motion.div
             key="overlay"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.6 }}
+            animate={{ opacity: 0.8 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black dark:bg-black z-40"
+            className="fixed inset-0 bg-black/30 dark:bg-black/60 backdrop-blur-sm z-40"
             onClick={() => setIsMenuOpen(false)}
           />
         )}
@@ -201,7 +201,7 @@ export default function Navbar() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-16 inset-x-0 mx-4 bg-white dark:bg-gray-700 shadow-xl rounded-md p-4 flex flex-col z-50"
+            className="fixed top-16 inset-x-0 mx-4 bg-white/90 dark:bg-gray-700/90 shadow-xl rounded-md p-4 flex flex-col z-50 backdrop-blur-xl border border-white/20 dark:border-gray-600/30"
           >
             <ul>
               {menuItems.map((item) => {
@@ -216,8 +216,8 @@ export default function Navbar() {
                       href={item.path}
                       className={`flex items-center px-4 py-2 rounded-md ${
                         isActive
-                          ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white"
-                          : "text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+                          ? "bg-gradient-to-r from-blue-500/90 to-indigo-500/90 text-white shadow-inner shadow-blue-500/30"
+                          : "text-gray-800 dark:text-gray-200 hover:bg-white/30 dark:hover:bg-gray-600/30 backdrop-blur-sm"
                       }`}
                       onClick={() => setIsMenuOpen(false)}
                     >
@@ -231,7 +231,7 @@ export default function Navbar() {
               <motion.li whileHover={{ scale: 1.02 }} className="mb-2">
                 <Link
                   href="/contact"
-                  className="flex items-center px-4 py-2 rounded-md text-white bg-gradient-to-r from-blue-500 to-indigo-500 hover:opacity-90"
+                  className="flex items-center px-4 py-2 rounded-md text-white bg-gradient-to-r from-blue-500/90 to-indigo-500/90 hover:opacity-90 shadow-inner shadow-blue-500/30 backdrop-blur-sm"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span className="mr-2">📬</span>
