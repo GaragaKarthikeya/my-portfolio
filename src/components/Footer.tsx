@@ -26,7 +26,6 @@ export default function Footer() {
   });
   const [submittedEmails, setSubmittedEmails] = useState<Set<string>>(new Set());
 
-  // Load previously submitted emails from localStorage
   useEffect(() => {
     const storedEmails = localStorage.getItem('subscribedEmails');
     if (storedEmails) {
@@ -34,40 +33,37 @@ export default function Footer() {
     }
   }, []);
 
-  // Email submission handler
   const sendEmail = async (e: React.FormEvent) => {
     e.preventDefault();
-    setState({ ...state, isLoading: true, error: null });
+    setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     if (!form.current) {
-      setState({
-        ...state,
+      setState(prev => ({
+        ...prev,
         isLoading: false,
         error: "Form configuration error. Please try again later.",
-      });
+      }));
       return;
     }
 
     const formData = new FormData(form.current);
     const email = formData.get('user_email') as string;
 
-    // Client-side validation
     if (!validateEmail(email)) {
-      setState({
-        ...state,
+      setState(prev => ({
+        ...prev,
         isLoading: false,
         error: "Please enter a valid email address",
-      });
+      }));
       return;
     }
 
-    // Check for duplicate submission
     if (submittedEmails.has(email)) {
-      setState({
-        ...state,
+      setState(prev => ({
+        ...prev,
         isLoading: false,
         successMessage: "You're already subscribed!",
-      });
+      }));
       setTimeout(() => setState(s => ({ ...s, successMessage: null })), 3000);
       return;
     }
@@ -78,13 +74,8 @@ export default function Footer() {
         process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
         form.current,
         process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
-      ).then((_result) => {
-        // Using an underscore to avoid lint warning for unused variable
-        console.log(_result.text);
-        alert("Thank you for subscribing!");
-      });
+      );
 
-      // Update local storage with new email
       const updatedEmails = new Set([...submittedEmails, email]);
       localStorage.setItem('subscribedEmails', JSON.stringify([...updatedEmails]));
       setSubmittedEmails(updatedEmails);
@@ -108,21 +99,17 @@ export default function Footer() {
       setState({
         isLoading: false,
         isSuccess: false,
-        error: error instanceof Error
-          ? error.message
-          : "Subscription failed. Please try again.",
+        error: error instanceof Error ? error.message : "Subscription failed. Please try again.",
         successMessage: null,
       });
     }
   };
 
-  // Email validation
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
   };
 
-  // Analytics tracking
   const trackAnalyticsEvent = (eventName: string) => {
     if (typeof window.gtag !== 'undefined') {
       window.gtag('event', eventName, {
@@ -153,10 +140,10 @@ export default function Footer() {
       />
 
       <motion.footer 
-        className="relative w-full bg-gray-100/80 dark:bg-gray-900/80 backdrop-blur-lg"
-        initial={{ backgroundColor: '#f3f4f6' }}
+        className="relative w-full bg-gray-300 dark:bg-gray-800 text-gray-800 dark:text-gray-300 py-6"
+        initial={{ opacity: 0 }}
         animate={{ 
-          backgroundColor: 'dark' ? '#111827' : '#f3f4f6',
+          opacity: 1,
           transition: { duration: 0.5 } 
         }}
       >
@@ -164,22 +151,19 @@ export default function Footer() {
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 relative">
           <div className="flex flex-col items-center space-y-8">
-            {/* Gradient Border */}
             <div className="h-1 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 w-full mb-8 rounded-full" />
 
-            {/* Newsletter Form */}
             <motion.div 
               className="w-full max-w-xs sm:max-w-md"
               variants={slideIn}
               initial="hidden"
               animate="visible"
             >
-              {/* Success/Error Messages */}
               {state.successMessage && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="p-4 bg-green-100 text-green-700 rounded-lg mb-4"
+                  className="p-4 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 rounded-lg mb-4"
                 >
                   {state.successMessage}
                 </motion.div>
@@ -189,7 +173,7 @@ export default function Footer() {
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="p-4 bg-red-100 text-red-700 rounded-lg mb-4"
+                  className="p-4 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-lg mb-4"
                 >
                   {state.error}
                 </motion.div>
@@ -205,7 +189,7 @@ export default function Footer() {
                     type="email"
                     name="user_email"
                     placeholder="Email address"
-                    className="w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none dark:bg-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+                    className="w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400"
                     required
                     disabled={state.isLoading}
                     whileFocus={{
@@ -238,7 +222,7 @@ export default function Footer() {
                     </div>
                   </motion.button>
                 </form>
-                <div className="absolute -top-8 right-2 bg-gray-800 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute -top-8 right-2 bg-gray-800 dark:bg-gray-700 text-white dark:text-gray-200 px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">
                   We'll never spam you
                 </div>
               </div>
@@ -250,7 +234,7 @@ export default function Footer() {
                 <br />
                 <a 
                   href="/privacy" 
-                  className="text-blue-500 hover:underline"
+                  className="text-blue-500 dark:text-blue-400 hover:underline"
                   aria-label="View privacy policy"
                 >
                   Privacy Policy
@@ -258,7 +242,6 @@ export default function Footer() {
               </p>
             </motion.div>
 
-            {/* Animated Social Links */}
             <motion.div 
               className="flex space-x-5 px-2 w-full justify-center"
               variants={slideIn}
@@ -274,13 +257,12 @@ export default function Footer() {
               </SocialLink>
             </motion.div>
 
-            {/* Copyright */}
             <motion.p 
-              className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-center px-4 mix-blend-difference contrast-more:font-semibold"
+              className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-center px-4"
               variants={slideIn}
             >
               &copy; {yearRange} Karthikeya Garaga. All rights reserved.<br className="sm:hidden" />
-              Built with <span className="text-blue-500">Next.js</span> & <span className="text-purple-500">Tailwind</span>
+              Built with <span className="text-blue-500 dark:text-blue-400">Next.js</span> & <span className="text-purple-500 dark:text-purple-400">Tailwind</span>
             </motion.p>
           </div>
         </div>
@@ -290,21 +272,24 @@ export default function Footer() {
 }
 
 // Social Link Component
-const SocialLink = memo(function SocialLink({ href, children, label }: { 
-  href: string, 
-  children: React.ReactNode,
-  label: string 
+const SocialLink = memo(function SocialLink({ 
+  href, 
+  children, 
+  label 
+}: { 
+  href: string; 
+  children: React.ReactNode;
+  label: string; 
 }) {
   return (
     <motion.a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="p-2 rounded-lg dark:hover:bg-gray-700"
+      className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
       aria-label={label}
       whileHover={{ 
         scale: 1.1,
-        backgroundColor: '#f3f4f6',
         transition: { type: 'spring', stiffness: 300 }
       }}
       whileTap={{ scale: 0.9 }}
@@ -315,7 +300,7 @@ const SocialLink = memo(function SocialLink({ href, children, label }: {
           rotateX: -5,
           transition: { type: 'spring' }
         }}
-        className="w-6 h-6 block text-gray-700 dark:text-gray-300"
+        className="w-6 h-6 block text-gray-800 dark:text-gray-200"
       >
         {children}
       </motion.span>
@@ -324,6 +309,7 @@ const SocialLink = memo(function SocialLink({ href, children, label }: {
 });
 SocialLink.displayName = 'SocialLink';
 
+// Icons (using currentColor to inherit text color)
 const GitHubIcon = memo(function GitHubIcon() {
   return (
     <svg fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
@@ -354,7 +340,7 @@ EmailIcon.displayName = 'EmailIcon';
 const SpinnerIcon = memo(function SpinnerIcon() {
   return (
     <svg
-      className="animate-spin h-4 w-4 text-white"
+      className="animate-spin h-4 w-4 text-current"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
