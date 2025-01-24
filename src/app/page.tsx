@@ -9,21 +9,42 @@ const animationDuration = 0.8;
 const ease = "easeOut";
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const form = useRef<HTMLFormElement>(null);
 
+  // Theme initialization with system preference fallback
   useEffect(() => {
+    setMounted(true);
     const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      setIsDarkMode(true);
+    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialTheme = savedTheme ? savedTheme === 'dark' : systemDark;
+    
+    setIsDarkMode(initialTheme);
+    if (initialTheme) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
     }
   }, []);
 
+  // Theme toggle handler
   const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    localStorage.setItem("theme", isDarkMode ? "light" : "dark");
+    const newDarkMode = !isDarkMode;
+    setIsDarkMode(newDarkMode);
+    
+    if (newDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem("theme", "light");
+    }
   };
+
+  // Prevent hydration mismatch
+  if (!mounted) return null;
 
   const skills = [
     "Front-End Development with React and Tailwind CSS",
@@ -38,6 +59,7 @@ export default function Home() {
     transition: { duration: 0.5, ease: "easeOut" }
   };
 
+  // Email submission handler
   const sendEmail = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -54,20 +76,20 @@ export default function Home() {
       form.current,
       'aaZOM5ZPvGPJIfby3'
     )
-      .then((result) => {
-        console.log(result.text);
-        alert('Thank you for subscribing!');
-      }, (error) => {
-        console.log(error.text);
-        alert('Failed to send the email, please try again.');
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    .then((result) => {
+      console.log(result.text);
+      alert('Thank you for subscribing!');
+    }, (error) => {
+      console.log(error.text);
+      alert('Failed to send the email, please try again.');
+    })
+    .finally(() => {
+      setIsLoading(false);
+    });
   };
 
   return (
-    <div className={`${isDarkMode ? "dark" : ""}`}>
+    <div>
       <Head>
         <title>Karthikeya&apos;s Portfolio</title>
         <meta
@@ -75,13 +97,16 @@ export default function Home() {
           content="Explore my work as a front-end developer, ECE student, and VLSI enthusiast."
         />
       </Head>
+
+      {/* Dark Mode Toggle */}
       <button
         onClick={toggleDarkMode}
-        className="absolute top-4 right-4 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
-        aria-label="Toggle dark mode"
+        className="absolute top-4 right-4 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-200"
+        aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
       >
         {isDarkMode ? "☀️" : "🌙"}
       </button>
+
       <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 px-6 py-10">
         <motion.div
           className="w-full max-w-4xl text-center rounded-2xl p-10 bg-gray-200 dark:bg-gray-800 shadow-lg"
@@ -153,7 +178,7 @@ export default function Home() {
             </ul>
           </motion.div>
 
-          {/* Contact Teaser */}
+          {/* Newsletter Form */}
           <motion.div
             className="mt-10"
             initial={{ opacity: 0, y: 20 }}
