@@ -12,6 +12,7 @@ import {
   FaMoon,
   FaTimes,
 } from "react-icons/fa";
+import useSound from "use-sound";
 
 export default function Navbar() {
   // --------------------
@@ -21,6 +22,8 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const pathname = usePathname();
+  const [playHover] = useSound("/sounds/hover.mp3", { volume: 0.25 });
+  const [playClick] = useSound("/sounds/click.mp3", { volume: 0.3 });
 
   // --------------------
   // THEME MANAGEMENT
@@ -36,6 +39,7 @@ export default function Navbar() {
   }, []);
 
   const toggleTheme = () => {
+    playClick();
     setIsDarkMode((prev) => {
       document.documentElement.classList.toggle("dark", !prev);
       localStorage.setItem("theme", !prev ? "dark" : "light");
@@ -57,14 +61,8 @@ export default function Navbar() {
     { name: "Blogs", path: "/blogs", icon: <FaBlog className="mr-2" /> },
   ];
 
-  // --------------------
-  // RENDER GUARD
-  // --------------------
   if (!mounted) return null;
 
-  // --------------------
-  // COMPONENT RENDER
-  // --------------------
   return (
     <>
       {/* MAIN NAVBAR */}
@@ -72,28 +70,23 @@ export default function Navbar() {
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="fixed top-0 inset-x-0 z-50 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-b border-white/20 dark:border-gray-700/30 shadow-xl shadow-gray-200/20 dark:shadow-gray-900/30"
+        className="fixed top-0 inset-x-0 z-50 bg-gray-100 dark:bg-gray-900 backdrop-blur-lg border-b border-gray-200/20 dark:border-gray-800/30 shadow-sm"
       >
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          {/* LEFT SIDE - THEME TOGGLE (MOBILE) */}
+          
+          {/* MOBILE THEME TOGGLE */}
           <div className="md:hidden flex items-center">
             <button
               onClick={toggleTheme}
-              className="hover:scale-110 transition-transform p-2 rounded-full backdrop-blur-sm bg-white/30 dark:bg-gray-800/30 border border-white/10 dark:border-gray-600/20"
+              className="p-2 rounded-full backdrop-blur-sm bg-gray-200/30 dark:bg-gray-800/30 border border-gray-300/20 dark:border-gray-700/30 hover:scale-110 transition-transform"
               aria-label={`Switch to ${isDarkMode ? "light" : "dark"} mode`}
             >
               {isDarkMode ? (
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 0.5 }}
-                >
+                <motion.div animate={{ rotate: 360 }} transition={{ duration: 0.5 }}>
                   <FaSun className="text-yellow-400 w-6 h-6" />
                 </motion.div>
               ) : (
-                <motion.div
-                  animate={{ rotate: 180 }}
-                  transition={{ duration: 0.5 }}
-                >
+                <motion.div animate={{ rotate: 180 }} transition={{ duration: 0.5 }}>
                   <FaMoon className="w-6 h-6 text-gray-800 dark:text-gray-300" />
                 </motion.div>
               )}
@@ -102,42 +95,44 @@ export default function Navbar() {
 
           {/* DESKTOP MENU */}
           <ul className="hidden md:flex space-x-4 items-center">
-            {menuItems.map((item) => {
-              const isActive = pathname === item.path;
-              return (
-                <li key={item.name}>
-                  <Link
-                    href={item.path}
-                    className={`flex items-center px-4 py-2 rounded-md transition-all ${
-                      isActive
-                        ? "bg-gradient-to-r from-blue-500/90 to-indigo-500/90 text-white shadow-lg shadow-blue-500/30"
-                        : "text-gray-800 dark:text-gray-300 hover:bg-white/30 dark:hover:bg-gray-700/30 backdrop-blur-sm border border-white/20 dark:border-gray-600/20"
-                    }`}
-                  >
-                    {item.icon}
-                    {item.name}
-                  </Link>
-                </li>
-              );
-            })}
+            {menuItems.map((item) => (
+              <motion.li 
+                key={item.name}
+                whileHover={{ scale: 1.05 }}
+                onHoverStart={playHover}
+              >
+                <Link
+                  href={item.path}
+                  className={`px-4 py-2 rounded-md flex items-center transition-all ${
+                    pathname === item.path
+                      ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg"
+                      : "text-gray-800 dark:text-gray-300 hover:bg-gray-200/30 dark:hover:bg-gray-700/30 backdrop-blur-sm border border-gray-300/20 dark:border-gray-600/20"
+                  }`}
+                >
+                  {item.icon}
+                  {item.name}
+                </Link>
+              </motion.li>
+            ))}
 
-            {/* DESKTOP CONTACT BUTTON */}
-            <li>
+            {/* CONTACT BUTTON */}
+            <motion.li whileHover={{ scale: 1.05 }}>
               <Link
                 href="/contact"
-                className="flex items-center px-4 py-2 rounded-md text-white bg-gradient-to-r from-blue-500/90 to-indigo-500/90 hover:opacity-90 shadow-lg shadow-blue-500/30 backdrop-blur-sm"
+                className="px-4 py-2 rounded-md flex items-center bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg hover:opacity-90"
+                onClick={playClick}
               >
                 <span className="mr-2">📬</span>
                 Contact Me
               </Link>
-            </li>
+            </motion.li>
           </ul>
 
-          {/* RIGHT SIDE - HAMBURGER (MOBILE) */}
+          {/* MOBILE MENU TOGGLE */}
           <div className="md:hidden flex items-center justify-end flex-1">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-lg hover:bg-white/30 dark:hover:bg-gray-700/30 backdrop-blur-sm border border-white/20 dark:border-gray-600/20 relative z-50"
+              className="p-2 rounded-lg hover:bg-gray-200/30 dark:hover:bg-gray-700/30 backdrop-blur-sm border border-gray-300/20 dark:border-gray-600/20 relative z-50"
               aria-label="Toggle menu"
             >
               {isMenuOpen ? (
@@ -156,21 +151,15 @@ export default function Navbar() {
           <div className="hidden md:flex items-center">
             <button
               onClick={toggleTheme}
-              className="hover:scale-110 transition-transform p-2 rounded-full backdrop-blur-sm bg-white/30 dark:bg-gray-800/30 border border-white/10 dark:border-gray-600/20"
+              className="p-2 rounded-full backdrop-blur-sm bg-gray-200/30 dark:bg-gray-800/30 border border-gray-300/20 dark:border-gray-700/30 hover:scale-110 transition-transform"
               aria-label={`Switch to ${isDarkMode ? "light" : "dark"} mode`}
             >
               {isDarkMode ? (
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 0.5 }}
-                >
+                <motion.div animate={{ rotate: 360 }} transition={{ duration: 0.5 }}>
                   <FaSun className="text-yellow-400 w-6 h-6" />
                 </motion.div>
               ) : (
-                <motion.div
-                  animate={{ rotate: 180 }}
-                  transition={{ duration: 0.5 }}
-                >
+                <motion.div animate={{ rotate: 180 }} transition={{ duration: 0.5 }}>
                   <FaMoon className="w-6 h-6 text-gray-800 dark:text-gray-300" />
                 </motion.div>
               )}
@@ -179,34 +168,28 @@ export default function Navbar() {
         </div>
       </motion.nav>
 
-      {/* OVERLAY BEHIND MOBILE MENU */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            key="overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.8 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/30 dark:bg-black/60 backdrop-blur-sm z-40"
-            onClick={() => setIsMenuOpen(false)}
-          />
-        )}
-      </AnimatePresence>
-
       {/* MOBILE MENU */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div
-            key="mobile-menu"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed top-16 inset-x-0 mx-4 bg-white/90 dark:bg-gray-700/90 shadow-xl rounded-md p-4 flex flex-col z-50 backdrop-blur-xl border border-white/20 dark:border-gray-600/30"
-          >
-            <ul>
-              {menuItems.map((item) => {
-                const isActive = pathname === item.path;
-                return (
+          <>
+            <motion.div
+              key="overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.8 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/30 dark:bg-black/60 backdrop-blur-sm z-40"
+              onClick={() => setIsMenuOpen(false)}
+            />
+            
+            <motion.div
+              key="mobile-menu"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="fixed top-16 inset-x-0 mx-4 bg-gray-100/90 dark:bg-gray-900/90 shadow-xl rounded-md p-4 flex flex-col z-50 backdrop-blur-xl border border-gray-200/20 dark:border-gray-800/30"
+            >
+              <ul>
+                {menuItems.map((item) => (
                   <motion.li
                     key={item.name}
                     whileHover={{ scale: 1.02 }}
@@ -215,9 +198,9 @@ export default function Navbar() {
                     <Link
                       href={item.path}
                       className={`flex items-center px-4 py-2 rounded-md ${
-                        isActive
-                          ? "bg-gradient-to-r from-blue-500/90 to-indigo-500/90 text-white shadow-inner shadow-blue-500/30"
-                          : "text-gray-800 dark:text-gray-200 hover:bg-white/30 dark:hover:bg-gray-600/30 backdrop-blur-sm"
+                        pathname === item.path
+                          ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white"
+                          : "text-gray-800 dark:text-gray-300 hover:bg-gray-200/30 dark:hover:bg-gray-700/30"
                       }`}
                       onClick={() => setIsMenuOpen(false)}
                     >
@@ -225,21 +208,20 @@ export default function Navbar() {
                       {item.name}
                     </Link>
                   </motion.li>
-                );
-              })}
-              {/* MOBILE CONTACT BUTTON */}
-              <motion.li whileHover={{ scale: 1.02 }} className="mb-2">
-                <Link
-                  href="/contact"
-                  className="flex items-center px-4 py-2 rounded-md text-white bg-gradient-to-r from-blue-500/90 to-indigo-500/90 hover:opacity-90 shadow-inner shadow-blue-500/30 backdrop-blur-sm"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <span className="mr-2">📬</span>
-                  Contact Me
-                </Link>
-              </motion.li>
-            </ul>
-          </motion.div>
+                ))}
+                <motion.li whileHover={{ scale: 1.02 }} className="mb-2">
+                  <Link
+                    href="/contact"
+                    className="flex items-center px-4 py-2 rounded-md bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:opacity-90"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <span className="mr-2">📬</span>
+                    Contact Me
+                  </Link>
+                </motion.li>
+              </ul>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>
