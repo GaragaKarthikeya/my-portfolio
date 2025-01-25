@@ -46,7 +46,7 @@ export default function Navbar() {
   }, []);
 
   const createParticles = (x: number, y: number) => {
-    const newParticles = Array.from({ length: 8 }).map((_, i) => ({
+    const newParticles = Array.from({ length: 8 }).map(() => ({
       id: particleId.current++,
       x: x + Math.random() * 20 - 10,
       y: y + Math.random() * 20 - 10,
@@ -54,7 +54,7 @@ export default function Navbar() {
     setParticles((prev) => [...prev, ...newParticles]);
   };
 
-  const toggleTheme = (e: React.MouseEvent) => {
+  const toggleTheme = (_e: React.MouseEvent) => {
     playToggle();
     const rect = themeButtonRef.current?.getBoundingClientRect();
     if (rect) {
@@ -169,7 +169,9 @@ export default function Navbar() {
                   hoverTimeout.current = setTimeout(() => playHover(), 200);
                 }}
                 onHoverEnd={() => {
-                  hoverTimeout.current && clearTimeout(hoverTimeout.current);
+                  if (hoverTimeout.current) {
+                    clearTimeout(hoverTimeout.current);
+                  }
                 }}
                 className="relative"
               >
