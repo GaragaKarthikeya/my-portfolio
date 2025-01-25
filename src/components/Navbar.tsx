@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
@@ -42,43 +42,60 @@ export default function Navbar() {
     setIsDarkMode(initialTheme);
     document.documentElement.classList.toggle("dark", initialTheme);
 
-    return () => setMounted(false);
+    return () => {
+      setMounted(false);
+      if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
+    };
   }, []);
 
-  const createParticles = (x: number, y: number) => {
+  const createParticles = useCallback((x: number, y: number) => {
     const newParticles = Array.from({ length: 8 }).map(() => ({
       id: particleId.current++,
       x: x + Math.random() * 20 - 10,
       y: y + Math.random() * 20 - 10,
     }));
-    setParticles((prev) => [...prev, ...newParticles]);
-  };
+    setParticles(prev => [...prev, ...newParticles]);
+  }, []);
 
-  const toggleTheme = (_e: React.MouseEvent) => {
+  const toggleTheme = useCallback(() => {
     playToggle();
     const rect = themeButtonRef.current?.getBoundingClientRect();
     if (rect) {
       createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
     }
 
-    setIsDarkMode((prev) => {
+    setIsDarkMode(prev => {
       const newMode = !prev;
       document.documentElement.classList.toggle("dark", newMode);
       localStorage.setItem("theme", newMode ? "dark" : "light");
       return newMode;
     });
-  };
+  }, [createParticles, playToggle]);
 
   // --------------------
   // MENU ITEMS
   // --------------------
-  const menuItems = [
+  const menuItems = useMemo(() => [
     { name: "Home", path: "/", icon: <FaHome className="mr-2" /> },
     { name: "About", path: "/about", icon: <FaInfoCircle className="mr-2" /> },
     { name: "Projects", path: "/projects", icon: <FaProjectDiagram className="mr-2" /> },
     { name: "Blogs", path: "/blogs", icon: <FaBlog className="mr-2" /> },
     { name: "Contact", path: "/contact", icon: <FaEnvelope className="mr-2" /> },
-  ];
+  ], []);
+
+  // --------------------
+  // KEYBOARD NAVIGATION
+  // --------------------
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isMenuOpen) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [isMenuOpen]);
 
   if (!mounted) return null;
 
@@ -89,25 +106,17 @@ export default function Navbar() {
         {particles.map((particle) => (
           <motion.div
             key={particle.id}
-            initial={{
-              scale: 1,
-              opacity: 1,
-              x: particle.x,
-              y: particle.y,
-            }}
+            initial={{ scale: 1, opacity: 1, x: particle.x, y: particle.y }}
             animate={{
               x: particle.x + (Math.random() - 0.5) * 100,
               y: particle.y - 100,
               scale: 0,
               opacity: 0,
             }}
-            transition={{
-              duration: 1.5,
-              ease: "easeOut",
-            }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
             className="fixed pointer-events-none z-[999] w-2 h-2 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 dark:from-blue-400 dark:to-purple-400"
             onAnimationComplete={() => {
-              setParticles((prev) => prev.filter((p) => p.id !== particle.id));
+              setParticles(prev => prev.filter(p => p.id !== particle.id));
             }}
           />
         ))}
@@ -119,6 +128,7 @@ export default function Navbar() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
         className="fixed top-0 inset-x-0 z-50 bg-gray-100/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200/20 dark:border-gray-800/30 shadow-sm"
+        aria-label="Main navigation"
         suppressHydrationWarning
       >
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between relative">
@@ -166,12 +176,10 @@ export default function Navbar() {
                 key={item.name}
                 whileHover={{ scale: 1.05 }}
                 onHoverStart={() => {
-                  hoverTimeout.current = setTimeout(() => playHover(), 200);
+                  hoverTimeout.current = setTimeout(playHover, 200);
                 }}
                 onHoverEnd={() => {
-                  if (hoverTimeout.current) {
-                    clearTimeout(hoverTimeout.current);
-                  }
+                  if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
                 }}
                 className="relative"
               >
@@ -182,6 +190,7 @@ export default function Navbar() {
                       ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg"
                       : "text-gray-800 dark:text-gray-300 hover:bg-gray-200/30 dark:hover:bg-gray-700/30 backdrop-blur-sm border border-gray-300/20 dark:border-gray-600/20"
                   }`}
+                  aria-current={pathname === item.path ? "page" : undefined}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-md" />
                   {item.icon}
@@ -207,6 +216,7 @@ export default function Navbar() {
                 className="p-2 rounded-lg hover:bg-gray-200/30 dark:hover:bg-gray-700/30 backdrop-blur-sm border border-gray-300/20 dark:border-gray-600/20 relative z-50 group"
                 aria-label="Toggle menu"
                 whileHover={{ scale: 1.1 }}
+                aria-expanded={isMenuOpen}
               >
                 {isMenuOpen ? (
                   <FaTimes className="w-6 h-6 text-gray-800 dark:text-gray-300" />
@@ -272,6 +282,7 @@ export default function Navbar() {
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/30 dark:bg-black/60 backdrop-blur-sm z-40"
               onClick={() => setIsMenuOpen(false)}
+              role="presentation"
             />
             
             <motion.div
@@ -280,6 +291,8 @@ export default function Navbar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               className="fixed top-16 inset-x-0 mx-4 bg-gray-100/90 dark:bg-gray-900/90 shadow-xl rounded-md p-4 flex flex-col z-50 backdrop-blur-xl border border-gray-200/20 dark:border-gray-800/30"
+              role="dialog"
+              aria-modal="true"
             >
               <ul>
                 {menuItems.map((item) => (
@@ -296,6 +309,7 @@ export default function Navbar() {
                           : "text-gray-800 dark:text-gray-300 hover:bg-gray-200/30 dark:hover:bg-gray-700/30"
                       }`}
                       onClick={() => setIsMenuOpen(false)}
+                      aria-current={pathname === item.path ? "page" : undefined}
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 opacity-0 hover:opacity-100 transition-opacity rounded-md" />
                       {item.icon}
