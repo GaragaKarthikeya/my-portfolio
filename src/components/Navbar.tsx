@@ -12,15 +12,19 @@ import {
   FaMoon,
   FaTimes,
   FaEnvelope,
+  FaDesktop,
 } from "react-icons/fa";
 import useSound from "use-sound";
+
+type ThemeMode = "system" | "dark" | "light";
 
 export default function Navbar() {
   // --------------------
   // STATE & CONSTANTS
   // --------------------
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [themeMode, setThemeMode] = useState<ThemeMode>("system");
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number }>>([]);
   const pathname = usePathname();
@@ -35,18 +39,54 @@ export default function Navbar() {
   // --------------------
   useEffect(() => {
     setMounted(true);
-    const savedTheme = localStorage.getItem("theme");
-    const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const initialTheme = savedTheme ? savedTheme === "dark" : systemDark;
     
-    setIsDarkMode(initialTheme);
-    document.documentElement.classList.toggle("dark", initialTheme);
+    const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const savedTheme = localStorage.getItem('theme') as ThemeMode | null;
+
+    // Set initial state
+    const initialThemeMode = savedTheme || "system";
+    setThemeMode(initialThemeMode);
+
+    const systemDark = colorSchemeQuery.matches;
+    const initialDark = initialThemeMode === "system" ? systemDark : initialThemeMode === "dark";
+    setIsDarkMode(initialDark);
+    document.documentElement.classList.toggle('dark', initialDark);
+
+    // System theme change handler
+    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+      if (themeMode === "system") {
+        setIsDarkMode(e.matches);
+        document.documentElement.classList.toggle('dark', e.matches);
+      }
+    };
+
+    colorSchemeQuery.addEventListener('change', handleSystemThemeChange);
 
     return () => {
+      colorSchemeQuery.removeEventListener('change', handleSystemThemeChange);
       setMounted(false);
-      if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
+      hoverTimeout.current && clearTimeout(hoverTimeout.current);
     };
-  }, []);
+  }, [themeMode]);
+
+  const toggleTheme = useCallback(() => {
+    playToggle();
+    const rect = themeButtonRef.current?.getBoundingClientRect();
+    if (rect) {
+      createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    }
+
+    setThemeMode(prev => {
+      const newMode: ThemeMode = prev === "system" ? "dark" : prev === "dark" ? "light" : "system";
+      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const newDark = newMode === "system" ? systemDark : newMode === "dark";
+      
+      localStorage.setItem('theme', newMode);
+      setIsDarkMode(newDark);
+      document.documentElement.classList.toggle('dark', newDark);
+      return newMode;
+    });
+  }, [playToggle]);
 
   const createParticles = useCallback((x: number, y: number) => {
     const newParticles = Array.from({ length: 8 }).map(() => ({
@@ -56,21 +96,6 @@ export default function Navbar() {
     }));
     setParticles(prev => [...prev, ...newParticles]);
   }, []);
-
-  const toggleTheme = useCallback(() => {
-    playToggle();
-    const rect = themeButtonRef.current?.getBoundingClientRect();
-    if (rect) {
-      createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
-    }
-
-    setIsDarkMode(prev => {
-      const newMode = !prev;
-      document.documentElement.classList.toggle("dark", newMode);
-      localStorage.setItem("theme", newMode ? "dark" : "light");
-      return newMode;
-    });
-  }, [createParticles, playToggle]);
 
   // --------------------
   // MENU ITEMS
@@ -84,15 +109,12 @@ export default function Navbar() {
   ], []);
 
   // --------------------
-  // KEYBOARD NAVIGATION
+  // ACCESSIBILITY
   // --------------------
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isMenuOpen) {
-        setIsMenuOpen(false);
-      }
+      if (e.key === "Escape" && isMenuOpen) setIsMenuOpen(false);
     };
-
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
   }, [isMenuOpen]);
@@ -115,9 +137,7 @@ export default function Navbar() {
             }}
             transition={{ duration: 1.5, ease: "easeOut" }}
             className="fixed pointer-events-none z-[999] w-2 h-2 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 dark:from-blue-400 dark:to-purple-400"
-            onAnimationComplete={() => {
-              setParticles(prev => prev.filter(p => p.id !== particle.id));
-            }}
+            onAnimationComplete={() => setParticles(prev => prev.filter(p => p.id !== particle.id))}
           />
         ))}
       </AnimatePresence>
@@ -138,12 +158,22 @@ export default function Navbar() {
               ref={themeButtonRef}
               onClick={toggleTheme}
               className="p-2 rounded-full backdrop-blur-sm bg-gray-200/30 dark:bg-gray-800/30 border border-gray-300/20 dark:border-gray-700/30 relative overflow-hidden"
-              aria-label={`Switch to ${isDarkMode ? "light" : "dark"} mode`}
+              aria-label={`Current theme: ${themeMode} (click to cycle)`}
               whileTap={{ scale: 0.9 }}
               transition={{ type: "spring", stiffness: 300, damping: 10 }}
             >
               <AnimatePresence mode="wait">
-                {isDarkMode ? (
+                {themeMode === "system" ? (
+                  <motion.div
+                    key="system"
+                    initial={{ rotate: -180, scale: 0 }}
+                    animate={{ rotate: 0, scale: 1 }}
+                    exit={{ rotate: 180, scale: 0 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    <FaDesktop className="w-6 h-6 text-gray-800 dark:text-gray-300" />
+                  </motion.div>
+                ) : isDarkMode ? (
                   <motion.div
                     key="sun"
                     initial={{ rotate: -180, scale: 0 }}
@@ -165,7 +195,6 @@ export default function Navbar() {
                   </motion.div>
                 )}
               </AnimatePresence>
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-400/20 dark:from-blue-400/20 dark:to-purple-400/20 opacity-0 hover:opacity-100 transition-opacity rounded-full" />
             </motion.button>
           </div>
 
@@ -175,12 +204,8 @@ export default function Navbar() {
               <motion.li 
                 key={item.name}
                 whileHover={{ scale: 1.05 }}
-                onHoverStart={() => {
-                  hoverTimeout.current = setTimeout(playHover, 200);
-                }}
-                onHoverEnd={() => {
-                  if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
-                }}
+                onHoverStart={() => hoverTimeout.current = setTimeout(playHover, 200)}
+                onHoverEnd={() => hoverTimeout.current && clearTimeout(hoverTimeout.current)}
                 className="relative"
               >
                 <Link
@@ -192,7 +217,6 @@ export default function Navbar() {
                   }`}
                   aria-current={pathname === item.path ? "page" : undefined}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-md" />
                   {item.icon}
                   {item.name}
                   {pathname === item.path && (
@@ -215,16 +239,16 @@ export default function Navbar() {
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="p-2 rounded-lg hover:bg-gray-200/30 dark:hover:bg-gray-700/30 backdrop-blur-sm border border-gray-300/20 dark:border-gray-600/20 relative z-50 group"
                 aria-label="Toggle menu"
-                whileHover={{ scale: 1.1 }}
                 aria-expanded={isMenuOpen}
+                whileHover={{ scale: 1.1 }}
               >
                 {isMenuOpen ? (
                   <FaTimes className="w-6 h-6 text-gray-800 dark:text-gray-300" />
                 ) : (
                   <div className="space-y-1">
-                    <span className="block w-6 h-0.5 bg-gray-800 dark:bg-gray-300 rounded-full transition-transform" />
-                    <span className="block w-6 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 dark:from-blue-300 dark:to-purple-300 rounded-full transition-transform" />
-                    <span className="block w-6 h-0.5 bg-gray-800 dark:bg-gray-300 rounded-full transition-transform" />
+                    <span className="block w-6 h-0.5 bg-gray-800 dark:bg-gray-300 rounded-full" />
+                    <span className="block w-6 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 dark:from-blue-300 dark:to-purple-300 rounded-full" />
+                    <span className="block w-6 h-0.5 bg-gray-800 dark:bg-gray-300 rounded-full" />
                   </div>
                 )}
               </motion.button>
@@ -236,13 +260,23 @@ export default function Navbar() {
                 ref={themeButtonRef}
                 onClick={toggleTheme}
                 className="p-2 rounded-full backdrop-blur-sm bg-gray-200/30 dark:bg-gray-800/30 border border-gray-300/20 dark:border-gray-700/30 relative overflow-hidden group"
-                aria-label={`Switch to ${isDarkMode ? "light" : "dark"} mode`}
+                aria-label={`Current theme: ${themeMode} (click to cycle)`}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 transition={{ type: "spring", stiffness: 300, damping: 10 }}
               >
                 <AnimatePresence mode="wait">
-                  {isDarkMode ? (
+                  {themeMode === "system" ? (
+                    <motion.div
+                      key="system"
+                      initial={{ rotate: -180, scale: 0 }}
+                      animate={{ rotate: 0, scale: 1 }}
+                      exit={{ rotate: 180, scale: 0 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <FaDesktop className="w-6 h-6 text-gray-800 dark:text-gray-300" />
+                    </motion.div>
+                  ) : isDarkMode ? (
                     <motion.div
                       key="sun"
                       initial={{ rotate: -180, scale: 0 }}
@@ -264,7 +298,6 @@ export default function Navbar() {
                     </motion.div>
                   )}
                 </AnimatePresence>
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-400/20 dark:from-blue-400/20 dark:to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-full" />
               </motion.button>
             </div>
           </div>
@@ -311,7 +344,6 @@ export default function Navbar() {
                       onClick={() => setIsMenuOpen(false)}
                       aria-current={pathname === item.path ? "page" : undefined}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 opacity-0 hover:opacity-100 transition-opacity rounded-md" />
                       {item.icon}
                       {item.name}
                     </Link>
