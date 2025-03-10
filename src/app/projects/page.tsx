@@ -6,6 +6,7 @@ import { NeuralBackground } from "@/components/NeuralBackground";
 import { client } from "@/lib/sanityClient";
 import { PortableText } from "@portabletext/react";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 // -----------------------------------------------------
 // 💀🔥 Interface for Project Structure
@@ -13,12 +14,15 @@ import { useState, useEffect } from "react";
 interface Project {
   _id: string;
   title: string;
-  description: any; // Now handles Portable Text block from Sanity
+  description: any; // Portable Text block from Sanity
   link: string;
   image: string;
   techStack: string[];
 }
 
+// -----------------------------------------------------
+// 💀🔥 TypeScript Props for ProjectCard
+// -----------------------------------------------------
 type ProjectProps = {
   readonly title: string;
   readonly description: React.ReactNode;
@@ -30,6 +34,7 @@ type ProjectProps = {
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<boolean>(false);
 
   // -----------------------------------------------------
   // 💀🔥 Fetch projects from Sanity CMS with error logging
@@ -42,6 +47,7 @@ export default function Projects() {
         setProjects(data);
       } catch (error) {
         console.error("🔥 Error fetching projects from Sanity:", error);
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -63,6 +69,14 @@ export default function Projects() {
         ease: "easeOut",
       },
     }),
+  };
+
+  // -----------------------------------------------------
+  // 💀🔥 Handle Image Source (Supports both local & external)
+  // -----------------------------------------------------
+  const getImageSrc = (image: string) => {
+    if (image.startsWith("http")) return image;
+    return `/images/${image}`;
   };
 
   return (
@@ -96,6 +110,17 @@ export default function Projects() {
           </motion.div>
         )}
 
+        {/* 💀🔥 Error Handler */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-red-500 text-center"
+          >
+            💀 Error fetching projects. Please try again later.
+          </motion.div>
+        )}
+
         {/* 💀🔥 Projects Grid */}
         <motion.div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -115,9 +140,15 @@ export default function Projects() {
                   <PortableText value={project.description} />
                 }
                 link={project.link}
-                image={project.image.startsWith("http")
-                  ? project.image
-                  : `/images/${project.image}`}
+                image={
+                  <Image
+                    src={getImageSrc(project.image)}
+                    alt={project.title}
+                    width={500}
+                    height={300}
+                    className="rounded-lg"
+                  />
+                }
                 techStack={project.techStack}
               />
             </motion.div>
