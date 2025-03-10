@@ -3,7 +3,8 @@
 import React, { useState, useEffect, FC } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image"; // Correct Image import
+import Image from "next/image";  // ✅ Correct way to import
+import favicon from "@/app/favicon.ico"; // ✅ Your profile photo
 import Typewriter from "typewriter-effect";
 import { FaGithub, FaLinkedin, FaTwitter, FaArrowDown } from "react-icons/fa";
 import { NeuralBackground } from "../components/NeuralBackground";
@@ -27,18 +28,19 @@ const HeroSection: FC = () => (
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
     >
-      {/* Profile Photo Container */}
+      {/* ✅ Fix: Use Next.js Image here */}
       <motion.div
         className="relative w-32 h-32 mx-auto mb-8 rounded-full overflow-hidden shadow-xl bg-gradient-to-br from-blue-400 to-purple-500 ring-4 ring-white/50 dark:ring-gray-800/50"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
       >
-        {/* Fix: Use a normal <img> tag instead of next/image */}
-        <img
-          src="/images/favicon.ico" // Correctly reference the favicon
+        <Image
+          src={favicon}
           alt="Profile Photo"
-          className="object-cover w-full h-full"
+          width={128}
+          height={128}
+          className="object-cover"
         />
       </motion.div>
 
@@ -87,42 +89,7 @@ const HeroSection: FC = () => (
           </a>
         ))}
       </motion.div>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.9, duration: 0.8 }}
-        className="flex flex-wrap justify-center gap-4"
-      >
-        <Link
-          href="/about"
-          className={`${buttonStyles} bg-blue-500 text-white hover:bg-blue-600 px-8 py-3`}
-        >
-          About Me
-        </Link>
-        <Link
-          href="/projects"
-          className={`${buttonStyles} bg-green-500 text-white hover:bg-green-600 px-8 py-3`}
-        >
-          Projects
-        </Link>
-        <Link
-          href="/contact"
-          className={`${buttonStyles} bg-blue-500 text-white hover:bg-blue-600 px-8 py-3`}
-        >
-          Contact
-        </Link>
-        <a
-          href="/resume.pdf"
-          target="_blank"
-          className={`${buttonStyles} border-2 border-blue-500 text-blue-500 dark:text-blue-400 hover:bg-blue-500 hover:text-white px-8 py-3`}
-        >
-          Resume
-        </a>
-      </motion.div>
     </motion.div>
-    <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
-      <FaArrowDown className="text-gray-600 dark:text-gray-400" />
-    </div>
   </section>
 );
 
@@ -149,7 +116,6 @@ const Home: FC = () => {
       <NeuralBackground />
       <div className="relative z-10 flex flex-col min-h-screen bg-transparent text-gray-800 dark:text-gray-100">
         <HeroSection />
-        {/* Additional sections can be added here */}
       </div>
     </div>
   );
