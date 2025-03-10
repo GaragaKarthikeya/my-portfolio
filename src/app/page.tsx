@@ -130,12 +130,13 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Update and draw pulses
-      pulses.current.forEach((pulse, index) => {
+      // Update and draw pulses (iterate backwards to safely remove finished pulses)
+      for (let i = pulses.current.length - 1; i >= 0; i--) {
+        const pulse = pulses.current[i];
         pulse.radius += pulse.speed;
         pulse.opacity -= 0.005;
         if (pulse.opacity <= 0 || pulse.radius >= pulse.maxRadius) {
-          pulses.current.splice(index, 1);
+          pulses.current.splice(i, 1);
         } else {
           ctx.beginPath();
           ctx.arc(pulse.x, pulse.y, pulse.radius, 0, Math.PI * 2);
@@ -143,11 +144,10 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
           ctx.lineWidth = 2;
           ctx.stroke();
         }
-      });
+      }
 
       // Occasionally generate a new pulse
       if (Math.random() < 0.005) {
-        // Create pulse at a random node
         const randomNode =
           nodes.current[Math.floor(Math.random() * nodes.current.length)];
         pulses.current.push({
@@ -160,22 +160,28 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
         });
       }
 
-      nodes.current.forEach((node, i) => {
+      // Update nodes
+      nodes.current.forEach((currentNode, i) => {
         // Mouse repulsion and connection effect
         if (mouseActive.current) {
-          const dx = mousePos.x - node.x;
-          const dy = mousePos.y - node.y;
+          const dx = mousePos.x - currentNode.x;
+          const dy = mousePos.y - currentNode.y;
           const dist = Math.hypot(dx, dy);
           const maxDist = 200;
           if (dist < maxDist) {
             const force = (maxDist - dist) / maxDist;
-            node.vx -= dx * force * 0.005;
-            node.vy -= dy * force * 0.005;
+            currentNode.vx -= dx * force * 0.005;
+            currentNode.vy -= dy * force * 0.005;
 
             ctx.beginPath();
-            ctx.moveTo(node.x, node.y);
+            ctx.moveTo(currentNode.x, currentNode.y);
             ctx.lineTo(mousePos.x, mousePos.y);
-            const grad = ctx.createLinearGradient(node.x, node.y, mousePos.x, mousePos.y);
+            const grad = ctx.createLinearGradient(
+              currentNode.x,
+              currentNode.y,
+              mousePos.x,
+              mousePos.y
+            );
             grad.addColorStop(0, gradientStart);
             grad.addColorStop(1, gradientEnd);
             ctx.strokeStyle = grad;
@@ -188,28 +194,30 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
         }
 
         // Pull node back toward its origin if it strays too far
-        const dxOrigin = node.originX - node.x;
-        const dyOrigin = node.originY - node.y;
+        const dxOrigin = currentNode.originX - currentNode.x;
+        const dyOrigin = currentNode.originY - currentNode.y;
         if (Math.hypot(dxOrigin, dyOrigin) > 100) {
-          node.vx += dxOrigin * 0.002;
-          node.vy += dyOrigin * 0.002;
+          currentNode.vx += dxOrigin * 0.002;
+          currentNode.vy += dyOrigin * 0.002;
         }
 
         // Add subtle jitter for continuous gentle motion
-        node.vx += (Math.random() - 0.5) * 0.001;
-        node.vy += (Math.random() - 0.5) * 0.001;
+        currentNode.vx += (Math.random() - 0.5) * 0.001;
+        currentNode.vy += (Math.random() - 0.5) * 0.001;
 
         // Update node position
-        node.x += node.vx;
-        node.y += node.vy;
+        currentNode.x += currentNode.vx;
+        currentNode.y += currentNode.vy;
 
         // Reflect off boundaries
-        if (node.x < 0 || node.x > canvas.width) node.vx = -node.vx;
-        if (node.y < 0 || node.y > canvas.height) node.vy = -node.vy;
+        if (currentNode.x < 0 || currentNode.x > canvas.width)
+          currentNode.vx = -currentNode.vx;
+        if (currentNode.y < 0 || currentNode.y > canvas.height)
+          currentNode.vy = -currentNode.vy;
 
         // Apply friction for gradual slowing
-        node.vx *= 0.99;
-        node.vy *= 0.99;
+        currentNode.vx *= 0.99;
+        currentNode.vy *= 0.99;
 
         // Calculate a pulse factor based on time for subtle node pulsing
         const pulseFactor = 1 + 0.2 * Math.sin(Date.now() / 500 + i);
@@ -217,12 +225,19 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
         // Determine if node is near the mouse pointer
         const isNearMouse =
           mouseActive.current &&
-          Math.hypot(mousePos.x - node.x, mousePos.y - node.y) < 100;
+          Math.hypot(mousePos.x - currentNode.x, mousePos.y - currentNode.y) <
+            100;
 
         // Draw glow if near mouse
         if (isNearMouse) {
           ctx.beginPath();
-          ctx.arc(node.x, node.y, node.radius * pulseFactor * 3, 0, Math.PI * 2);
+          ctx.arc(
+            currentNode.x,
+            currentNode.y,
+            currentNode.radius * pulseFactor * 3,
+            0,
+            Math.PI * 2
+          );
           ctx.fillStyle = "rgba(124, 58, 237, 0.3)";
           ctx.fill();
         }
@@ -238,7 +253,7 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
 
         // Draw node with pulsing effect and glow
         ctx.beginPath();
-        ctx.arc(node.x, node.y, node.radius * pulseFactor, 0, Math.PI * 2);
+        ctx.arc(currentNode.x, currentNode.y, currentNode.radius * pulseFactor, 0, Math.PI * 2);
         ctx.fillStyle = nodeFill;
         ctx.shadowBlur = 10;
         ctx.shadowColor = nodeFill;
@@ -247,23 +262,24 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
 
         // Draw lines between nearby nodes
         for (let j = i + 1; j < nodes.current.length; j++) {
-          const node2 = nodes.current[j];
-          const dx = node.x - node2.x;
-          const dy = node.y - node2.y;
-          const distance = Math.hypot(dx, dy);
+          const otherNode = nodes.current[j];
+          const dxNodes = currentNode.x - otherNode.x;
+          const dyNodes = currentNode.y - otherNode.y;
+          const distance = Math.hypot(dxNodes, dyNodes);
           if (distance < 150) {
             ctx.beginPath();
-            ctx.moveTo(node.x, node.y);
-            ctx.lineTo(node2.x, node2.y);
+            ctx.moveTo(currentNode.x, currentNode.y);
+            ctx.lineTo(otherNode.x, otherNode.y);
             const opacity = (1 - distance / 150) * 0.2;
-            const node2NearMouse =
+            const otherNearMouse =
               mouseActive.current &&
-              Math.hypot(mousePos.x - node2.x, mousePos.y - node2.y) < 100;
+              Math.hypot(mousePos.x - otherNode.x, mousePos.y - otherNode.y) <
+                100;
             ctx.strokeStyle =
-              isNearMouse || node2NearMouse
+              isNearMouse || otherNearMouse
                 ? `rgba(124, 58, 237, ${opacity * 2})`
                 : `rgba(59, 130, 246, ${opacity})`;
-            ctx.lineWidth = isNearMouse || node2NearMouse ? 1.5 : 0.8;
+            ctx.lineWidth = isNearMouse || otherNearMouse ? 1.5 : 0.8;
             ctx.shadowBlur = 5;
             ctx.shadowColor = isDark ? "#a5b4fc" : "#c7d2fe";
             ctx.stroke();
@@ -298,10 +314,7 @@ const NeuralBackground: FC = () => {
 // ---------------------------------------------------------------------------
 // Page Sections
 // ---------------------------------------------------------------------------
-const HeroSection: FC<{ currentDateTime: string; currentUser: string }> = ({
-  currentDateTime,
-  currentUser,
-}) => (
+const HeroSection: FC = () => (
   <section className="relative flex items-center justify-center min-h-screen px-4 py-10 z-10">
     <motion.div
       className="text-center relative z-10 max-w-4xl"
@@ -527,7 +540,7 @@ const TimelineSection: FC = () => {
   );
 };
 
-const CTASection: FC<{ currentDateTime: string }> = ({ currentDateTime }) => (
+const CTASection: FC = () => (
   <section className="py-20 px-4 z-10 relative">
     <div className="max-w-4xl mx-auto text-center">
       <motion.div
@@ -553,9 +566,6 @@ const CTASection: FC<{ currentDateTime: string }> = ({ currentDateTime }) => (
           </a>
         </div>
       </motion.div>
-      <div className="text-sm mt-8 text-gray-600 dark:text-gray-400">
-        Last updated: {currentDateTime}
-      </div>
     </div>
   </section>
 );
@@ -565,16 +575,9 @@ const CTASection: FC<{ currentDateTime: string }> = ({ currentDateTime }) => (
 // ---------------------------------------------------------------------------
 const Home: FC = () => {
   const [mounted, setMounted] = useState(false);
-  const [currentDateTime, setCurrentDateTime] = useState("2025-03-10 12:57:11");
-  const currentUser = "GaragaKarthikeya";
 
   useEffect(() => {
     setMounted(true);
-    const timer = setInterval(() => {
-      const now = new Date();
-      setCurrentDateTime(now.toISOString().replace("T", " ").substring(0, 19));
-    }, 1000);
-    return () => clearInterval(timer);
   }, []);
 
   if (!mounted) {
@@ -590,11 +593,11 @@ const Home: FC = () => {
       <NeuralBackground />
       {/* Main content container now has a completely transparent background */}
       <div className="relative z-10 flex flex-col min-h-screen bg-transparent text-gray-800 dark:text-gray-100">
-        <HeroSection currentDateTime={currentDateTime} currentUser={currentUser} />
+        <HeroSection />
         <AboutSection />
         <SkillsSection />
         <TimelineSection />
-        <CTASection currentDateTime={currentDateTime} />
+        <CTASection />
       </div>
     </div>
   );
