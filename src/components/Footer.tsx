@@ -4,7 +4,6 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import { useRef, useState, useEffect, memo } from 'react';
 import emailjs from '@emailjs/browser';
 
-// Define a proper type for the gtag function
 type GtagFunction = (
   command: string,
   eventName: string,
@@ -21,7 +20,6 @@ interface FormState {
 export default function Footer() {
   const form = useRef<HTMLFormElement>(null);
   const { scrollYProgress } = useScroll();
-  // Map full scroll progress
   const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
   const creationYear = 2024;
   const currentYear = new Date().getFullYear();
@@ -138,7 +136,6 @@ export default function Footer() {
     return re.test(email);
   };
 
-  // Track analytics event using our defined GtagFunction type
   const trackAnalyticsEvent = (eventName: string) => {
     if (typeof window !== 'undefined' && 'gtag' in window) {
       (window as Window & { gtag?: GtagFunction }).gtag?.('event', eventName, {
@@ -165,13 +162,13 @@ export default function Footer() {
         className="h-1 bg-gradient-to-r from-blue-500 to-purple-500 fixed bottom-0 left-0 right-0 origin-left z-50"
       />
 
+      {/* Footer with Transparent Background in Both Light and Dark Modes */}
       <motion.footer 
-        className="relative w-full bg-gray-300 dark:bg-gray-800 text-gray-800 dark:text-gray-300 py-6"
+        className="relative w-full bg-transparent text-gray-800 dark:text-gray-300 py-6 overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1, transition: { duration: 0.5 } }}
         suppressHydrationWarning
       >
-        <div className="absolute inset-0 opacity-5 dark:opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMiIvPjwvc3ZnPg==')]" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 relative">
           <div className="flex flex-col items-center space-y-8">
             <div className="h-1 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 w-full mb-8 rounded-full" />
