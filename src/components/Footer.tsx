@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { useRef, useState, useEffect, memo } from 'react';
 import emailjs from '@emailjs/browser';
 
@@ -11,10 +11,18 @@ interface FormState {
   successMessage: string | null;
 }
 
+// Add type declaration for gtag
+declare global {
+  interface Window {
+    gtag?: (command: string, action: string, params: object) => void;
+  }
+}
+
 export default function Footer() {
   const form = useRef<HTMLFormElement>(null);
   const { scrollYProgress } = useScroll();
-  const scaleX = useTransform(scrollYProgress, [0.9, 1], [0, 1]);
+  // Change the mapping to cover full scroll progress
+  const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
   const creationYear = 2024;
   const currentYear = new Date().getFullYear();
   const yearRange = currentYear > creationYear ? `${creationYear}-${currentYear}` : creationYear;
@@ -25,12 +33,29 @@ export default function Footer() {
     successMessage: null,
   });
   const [submittedEmails, setSubmittedEmails] = useState<Set<string>>(new Set());
+  const [inputFocused, setInputFocused] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
+  // Retrieve stored emails
   useEffect(() => {
-    const storedEmails = localStorage.getItem('subscribedEmails');
-    if (storedEmails) {
-      setSubmittedEmails(new Set(JSON.parse(storedEmails)));
+    try {
+      const storedEmails = localStorage.getItem('subscribedEmails');
+      if (storedEmails) {
+        setSubmittedEmails(new Set(JSON.parse(storedEmails)));
+      }
+    } catch (error) {
+      console.error('Error accessing localStorage:', error);
     }
+  }, []);
+
+  // Monitor scroll to show/hide the back-to-top button
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 300);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const sendEmail = async (e: React.FormEvent) => {
@@ -59,7 +84,7 @@ export default function Footer() {
     }
 
     if (submittedEmails.has(email)) {
-      setState(prev => ({
+      setState(prev => ({ 
         ...prev,
         isLoading: false,
         successMessage: "You're already subscribed!",
@@ -77,7 +102,11 @@ export default function Footer() {
       );
 
       const updatedEmails = new Set([...submittedEmails, email]);
-      localStorage.setItem('subscribedEmails', JSON.stringify([...updatedEmails]));
+      try {
+        localStorage.setItem('subscribedEmails', JSON.stringify([...updatedEmails]));
+      } catch (storageError) {
+        console.error('Error storing email in localStorage:', storageError);
+      }
       setSubmittedEmails(updatedEmails);
 
       setState({
@@ -111,7 +140,7 @@ export default function Footer() {
   };
 
   const trackAnalyticsEvent = (eventName: string) => {
-    if (typeof window.gtag !== 'undefined') {
+    if (typeof window !== 'undefined' && typeof window.gtag !== 'undefined') {
       window.gtag('event', eventName, {
         event_category: 'engagement',
         event_label: 'Newsletter Subscription',
@@ -122,18 +151,19 @@ export default function Footer() {
   const slideIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { 
-      opacity: 1, 
+      opacity: 1,
       y: 0,
       transition: { 
         type: 'spring',
         bounce: 0.4,
-        duration: 0.8 
+        duration: 0.8
       }
     }
   };
 
   return (
     <>
+      {/* Progress Bar */}
       <motion.div
         style={{ scaleX }}
         className="h-1 bg-gradient-to-r from-blue-500 to-purple-500 fixed bottom-0 left-0 right-0 origin-left z-50"
@@ -142,10 +172,8 @@ export default function Footer() {
       <motion.footer 
         className="relative w-full bg-gray-300 dark:bg-gray-800 text-gray-800 dark:text-gray-300 py-6"
         initial={{ opacity: 0 }}
-        animate={{ 
-          opacity: 1,
-          transition: { duration: 0.5 } 
-        }}
+        animate={{ opacity: 1, transition: { duration: 0.5 } }}
+        suppressHydrationWarning
       >
         <div className="absolute inset-0 opacity-5 dark:opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMiIvPjwvc3ZnPg==')]" />
         
@@ -192,10 +220,14 @@ export default function Footer() {
                     className="w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400"
                     required
                     disabled={state.isLoading}
-                    whileFocus={{
-                      scale: 1.02,
-                      boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.5)'
-                    }}
+                    onFocus={() => setInputFocused(true)}
+                    onBlur={() => setInputFocused(false)}
+                    animate={
+                      inputFocused
+                        ? { scale: 1.02, boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.5)' }
+                        : { scale: 1, boxShadow: 'none' }
+                    }
+                    suppressHydrationWarning
                   />
                   <motion.button
                     type="submit"
@@ -203,6 +235,7 @@ export default function Footer() {
                     disabled={state.isLoading}
                     whileHover={!state.isLoading ? { scale: 1.05 } : undefined}
                     whileTap={!state.isLoading ? { scale: 0.95 } : undefined}
+                    suppressHydrationWarning
                   >
                     {state.isLoading && (
                       <motion.div
@@ -218,7 +251,9 @@ export default function Footer() {
                           <SpinnerIcon />
                           Subscribing...
                         </>
-                      ) : 'Get Updates'}
+                      ) : (
+                        'Get Updates'
+                      )}
                     </div>
                   </motion.button>
                 </form>
@@ -233,7 +268,7 @@ export default function Footer() {
                 We respect your privacy. Unsubscribe at any time.
                 <br />
                 <a 
-                  href="/privacy" 
+                  href="/privacy"
                   className="text-blue-500 dark:text-blue-400 hover:underline"
                   aria-label="View privacy policy"
                 >
@@ -241,7 +276,6 @@ export default function Footer() {
                 </a>
               </p>
             </motion.div>
-
             <motion.div 
               className="flex space-x-5 px-2 w-full justify-center"
               variants={slideIn}
@@ -256,20 +290,63 @@ export default function Footer() {
                 <EmailIcon />
               </SocialLink>
             </motion.div>
-
             <motion.p 
               className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-center px-4"
               variants={slideIn}
             >
               &copy; {yearRange} Karthikeya Garaga. All rights reserved.<br className="sm:hidden" />
-              Built with <span className="text-blue-500 dark:text-blue-400">Next.js</span> & <span className="text-purple-500 dark:text-purple-400">Tailwind</span>
+              Built with <span className="text-blue-500 dark:text-blue-400">Next.js</span> &amp; <span className="text-purple-500 dark:text-purple-400">Tailwind</span>
             </motion.p>
           </div>
         </div>
       </motion.footer>
+
+      {/* Back-to-Top Button */}
+      <AnimatePresence>
+        {showBackToTop && <BackToTopButton key="back-to-top" />}
+      </AnimatePresence>
     </>
   );
 }
+
+// Back-to-Top Button Component with updated styling
+const BackToTopButton = () => {
+  const handleClick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
+    <motion.button
+      onClick={handleClick}
+      className="fixed bottom-20 right-5 p-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow-lg z-50"
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.8 }}
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.95 }}
+      aria-label="Back to top"
+    >
+      <ChevronUpIcon />
+    </motion.button>
+  );
+};
+
+// Chevron Up Icon Component for Back-to-Top Button
+const ChevronUpIcon = memo(function ChevronUpIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-5 w-5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+    </svg>
+  );
+});
+
+ChevronUpIcon.displayName = 'ChevronUpIcon';
 
 // Social Link Component
 const SocialLink = memo(function SocialLink({ 
@@ -293,6 +370,7 @@ const SocialLink = memo(function SocialLink({
         transition: { type: 'spring', stiffness: 300 }
       }}
       whileTap={{ scale: 0.9 }}
+      suppressHydrationWarning
     >
       <motion.span
         whileHover={{
@@ -307,6 +385,7 @@ const SocialLink = memo(function SocialLink({
     </motion.a>
   );
 });
+
 SocialLink.displayName = 'SocialLink';
 
 // Icons (using currentColor to inherit text color)
@@ -317,6 +396,7 @@ const GitHubIcon = memo(function GitHubIcon() {
     </svg>
   );
 });
+
 GitHubIcon.displayName = 'GitHubIcon';
 
 const LinkedInIcon = memo(function LinkedInIcon() {
@@ -326,6 +406,7 @@ const LinkedInIcon = memo(function LinkedInIcon() {
     </svg>
   );
 });
+
 LinkedInIcon.displayName = 'LinkedInIcon';
 
 const EmailIcon = memo(function EmailIcon() {
@@ -335,6 +416,7 @@ const EmailIcon = memo(function EmailIcon() {
     </svg>
   );
 });
+
 EmailIcon.displayName = 'EmailIcon';
 
 const SpinnerIcon = memo(function SpinnerIcon() {
@@ -361,4 +443,5 @@ const SpinnerIcon = memo(function SpinnerIcon() {
     </svg>
   );
 });
+
 SpinnerIcon.displayName = 'SpinnerIcon';

@@ -71,7 +71,7 @@ export function useTheme() {
     document.documentElement.classList.toggle("dark", initialDark);
 
     const handleSystemChange = (e: MediaQueryListEvent) => {
-      if (initialTheme === "system") {
+      if (themeMode === "system") {  // Use themeMode instead of initialTheme
         setIsDarkMode(e.matches);
         document.documentElement.classList.toggle("dark", e.matches);
       }
@@ -81,7 +81,7 @@ export function useTheme() {
     return () => {
       colorSchemeQuery.removeEventListener("change", handleSystemChange);
     };
-  }, []);
+  }, [themeMode]); // Add themeMode as a dependency
 
   const toggleTheme = useCallback(() => {
     const newMode: ThemeMode =
@@ -303,7 +303,17 @@ const MobileMenu: FC<MobileMenuProps> = ({
             aria-label="Navigation menu"
             aria-labelledby="mobile-menu-heading"
           >
-            <h2 id="mobile-menu-heading" className="sr-only">Navigation Menu</h2>
+            <div className="flex justify-between items-center mb-3">
+              <h2 id="mobile-menu-heading" className="text-lg font-medium text-gray-800 dark:text-gray-200">Menu</h2>
+              <motion.button
+                onClick={() => setIsOpen(false)}
+                className="p-2 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-700/50"
+                aria-label="Close menu"
+                whileHover={reducedMotion ? {} : { scale: 1.1 }}
+              >
+                <FaTimes className="w-5 h-5 text-gray-800 dark:text-gray-300" />
+              </motion.button>
+            </div>
             <ul role="menu">
               {menuItems.map((item) => (
                 <motion.li
@@ -503,6 +513,7 @@ export default function Navbar() {
               whileHover={reducedMotion ? {} : { scale: 1.1 }}
               whileTap={reducedMotion ? {} : { scale: 0.9 }}
               transition={{ type: "spring", stiffness: 300, damping: 10 }}
+              suppressHydrationWarning
             >
               {soundEnabled ? (
                 <FaVolumeUp className="w-6 h-6 text-gray-800 dark:text-gray-300" />
