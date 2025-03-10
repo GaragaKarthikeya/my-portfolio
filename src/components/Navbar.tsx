@@ -34,17 +34,33 @@ import useSound from "use-sound";
 =================================== */
 export type ThemeMode = "system" | "dark" | "light";
 
+// Add this utility near the top of your file, before the useTheme hook
+const safeLocalStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      return localStorage.getItem(key);
+    } catch (error) {
+      console.error(`Error reading ${key} from localStorage:`, error);
+      return null;
+    }
+  },
+  setItem: (key: string, value: string): boolean => {
+    try {
+      localStorage.setItem(key, value);
+      return true;
+    } catch (error) {
+      console.error(`Error writing ${key} to localStorage:`, error);
+      return false;
+    }
+  }
+};
+
 export function useTheme() {
   const [themeMode, setThemeMode] = useState<ThemeMode>("system");
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
-    let savedTheme: ThemeMode | null = null;
-    try {
-      savedTheme = localStorage.getItem("theme") as ThemeMode | null;
-    } catch (error) {
-      console.error("Local storage error:", error);
-    }
+    const savedTheme = safeLocalStorage.getItem("theme") as ThemeMode | null;
     const initialTheme = savedTheme || "system";
     setThemeMode(initialTheme);
 
@@ -72,11 +88,9 @@ export function useTheme() {
       themeMode === "system" ? "dark" : themeMode === "dark" ? "light" : "system";
     const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const newDark = newMode === "system" ? systemDark : newMode === "dark";
-    try {
-      localStorage.setItem("theme", newMode);
-    } catch (error) {
-      console.error("Local storage error:", error);
-    }
+
+    safeLocalStorage.setItem("theme", newMode);
+
     setThemeMode(newMode);
     setIsDarkMode(newDark);
     document.documentElement.classList.toggle("dark", newDark);
@@ -286,13 +300,17 @@ const MobileMenu: FC<MobileMenuProps> = ({
             className="fixed top-16 inset-x-0 mx-4 bg-gray-100/90 dark:bg-gray-900/90 shadow-xl rounded-md p-4 flex flex-col z-50 backdrop-blur-xl border border-gray-200/20 dark:border-gray-800/30"
             role="dialog"
             aria-modal="true"
+            aria-label="Navigation menu"
+            aria-labelledby="mobile-menu-heading"
           >
-            <ul>
+            <h2 id="mobile-menu-heading" className="sr-only">Navigation Menu</h2>
+            <ul role="menu">
               {menuItems.map((item) => (
                 <motion.li
                   key={item.name}
                   whileHover={reducedMotion ? {} : { scale: 1.02 }}
                   className="mb-2"
+                  role="menuitem"
                 >
                   <Link
                     href={item.path}
@@ -305,7 +323,7 @@ const MobileMenu: FC<MobileMenuProps> = ({
                     aria-current={currentPath === item.path ? "page" : undefined}
                   >
                     {item.icon}
-                    {item.name}
+                    <span>{item.name}</span>
                   </Link>
                 </motion.li>
               ))}
@@ -327,8 +345,21 @@ export default function Navbar() {
   const pathname = usePathname();
   const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const themeButtonRef = useRef<HTMLButtonElement>(null);
-  const [playHover] = useSound("/sounds/hover.mp3", { volume: 0.25 });
-  const [playToggle] = useSound("/sounds/toggle.mp3", { volume: 0.3 });
+  const [playHover] = useSound("/sounds/hover.mp3", { 
+    volume: 0.25,
+    // Add error handling
+    onplayerror: () => {
+      console.warn("Could not play hover sound. File may be missing.");
+    }
+  });
+  
+  const [playToggle] = useSound("/sounds/toggle.mp3", { 
+    volume: 0.3,
+    // Add error handling
+    onplayerror: () => {
+      console.warn("Could not play toggle sound. File may be missing.");
+    }
+  });
   const particleId = useRef(0);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -346,6 +377,11 @@ export default function Navbar() {
   }, []);
 
   const createParticles = useCallback((x: number, y: number) => {
+    // Reset counter if it gets too large to prevent potential issues
+    if (particleId.current > 10000) {
+      particleId.current = 0;
+    }
+    
     const newParticles = Array.from({ length: 8 }).map(() => ({
       id: particleId.current++,
       x: x + Math.random() * 20 - 10,
