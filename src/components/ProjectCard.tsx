@@ -17,8 +17,8 @@ const ProjectCard: FC<ProjectProps> = ({
   techStack = [],
 }) => {
   return (
-    <article className="group bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
-      {/* Image Container with improved aspect ratio */}
+    <article className="group relative bg-white/70 dark:bg-gray-700/70 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden backdrop-blur-sm border border-white/40 dark:border-gray-700/50">
+      {/* Image Container */}
       <div className="relative w-full h-48 sm:h-56 md:h-64 aspect-video">
         <Image
           src={image}

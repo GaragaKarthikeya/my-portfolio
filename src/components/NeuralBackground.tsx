@@ -1,12 +1,24 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback, FC } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+  FC,
+} from "react";
 
 // ---------------------------------------------------------------------------
 // Helper: Random value between min and max
 // ---------------------------------------------------------------------------
 const randomBetween = (min: number, max: number): number =>
   Math.random() * (max - min) + min;
+
+// ---------------------------------------------------------------------------
+// Constant: Reference area for dynamic particle scaling (1080p)
+// ---------------------------------------------------------------------------
+const REFERENCE_AREA = 1920 * 1080;
 
 // ---------------------------------------------------------------------------
 // Types
@@ -58,15 +70,19 @@ interface Shockwave {
 // ---------------------------------------------------------------------------
 // Custom Hook: useNeuralAnimation
 // ---------------------------------------------------------------------------
-const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement | null>) => {
-  // Use lazy initializer for dimensions and dark mode so SSR gets stable values
+const useNeuralAnimation = (
+  canvasRef: React.RefObject<HTMLCanvasElement | null>
+) => {
+  // Lazy initializer for dimensions and dark mode
   const [dimensions, setDimensions] = useState(() =>
     typeof window !== "undefined"
       ? { width: window.innerWidth, height: window.innerHeight }
       : { width: 0, height: 0 }
   );
   const [isDark, setIsDark] = useState(() =>
-    typeof window !== "undefined" ? window.matchMedia("(prefers-color-scheme: dark)").matches : false
+    typeof window !== "undefined"
+      ? window.matchMedia("(prefers-color-scheme: dark)").matches
+      : false
   );
   const mousePosRef = useRef({ x: 0, y: 0 });
   const animationFrameId = useRef<number | null>(null);
@@ -76,24 +92,24 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement | null>
   const shockwaves = useRef<Shockwave[]>([]);
   const mouseActive = useRef(false);
 
-  // Reference area for scaling (1080p resolution)
-  const REFERENCE_AREA = 1920 * 1080;
-
-  const configRef = useRef({
-    nodeDensity: randomBetween(14000, 16000),
-    maxNodes:
-      typeof window !== "undefined" && window.innerWidth < 768
-        ? Math.round(randomBetween(45, 55))
-        : Math.round(randomBetween(90, 110)),
-    pulseSpeed: randomBetween(0.4, 0.6),
-    forceMultiplier: randomBetween(0.004, 0.006),
-    friction: randomBetween(0.98, 0.99),
-    interactionRadius: randomBetween(180, 220),
-    // Increase glow radius for extra glow
-    glowRadius: randomBetween(90, 110) + 20,
-    connectionDistance: 150,
-  });
-  const config = configRef.current;
+  // Memoized configuration object (stable across renders)
+  const config = useMemo(
+    () => ({
+      nodeDensity: randomBetween(14000, 16000),
+      maxNodes:
+        typeof window !== "undefined" && window.innerWidth < 768
+          ? Math.round(randomBetween(45, 55))
+          : Math.round(randomBetween(90, 110)),
+      pulseSpeed: randomBetween(0.4, 0.6),
+      forceMultiplier: randomBetween(0.004, 0.006),
+      friction: randomBetween(0.98, 0.99),
+      interactionRadius: randomBetween(180, 220),
+      // Increased glow radius for extra glow effect
+      glowRadius: randomBetween(90, 110) + 20,
+      connectionDistance: 150,
+    }),
+    []
+  );
 
   const updateDimensions = useCallback(() => {
     if (typeof window !== "undefined") {
@@ -165,15 +181,15 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement | null>
       window.removeEventListener("touchmove", handleTouchMove);
       window.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [dimensions]);
+  }, []);
 
-  // Click events (include dimensions for scaling)
+  // Click events – note: config and REFERENCE_AREA are stable, so safe to include
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       const canvas = canvasRef.current;
       if (!canvas) return;
-      // Calculate scale factor based on screen area
-      const scaleFactor = (dimensions.width * dimensions.height) / REFERENCE_AREA;
+      const scaleFactor =
+        (dimensions.width * dimensions.height) / REFERENCE_AREA;
       shockwaves.current.push({
         x: e.clientX,
         y: e.clientY,
@@ -187,7 +203,6 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement | null>
       nodes.current.forEach((node) => {
         const dist = Math.hypot(node.x - e.clientX, node.y - e.clientY);
         if (dist < 80) {
-          // Generate a scaled number of particles
           const baseCount = 5;
           const particleCount = Math.floor(baseCount * scaleFactor);
           for (let k = 0; k < particleCount; k++) {
@@ -208,7 +223,7 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement | null>
     };
     window.addEventListener("click", handleClick);
     return () => window.removeEventListener("click", handleClick);
-  }, [canvasRef, dimensions]);
+  }, [canvasRef, dimensions, config]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -219,7 +234,6 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement | null>
     canvas.width = dimensions.width;
     canvas.height = dimensions.height;
 
-    // Initialize nodes if empty
     if (nodes.current.length === 0) {
       const nodeCount = Math.min(
         Math.floor((dimensions.width * dimensions.height) / config.nodeDensity),
@@ -238,11 +252,12 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement | null>
       }
     }
 
-    // Adjust gradient colors for enhanced glow
     const gradientStart = isDark
       ? "rgba(180, 100, 255, 0.5)"
       : "rgba(124, 58, 237, 0.5)";
-    const gradientEnd = isDark ? "rgba(80, 0, 150, 0)" : "rgba(59,130,246, 0)";
+    const gradientEnd = isDark
+      ? "rgba(80, 0, 150, 0)"
+      : "rgba(59,130,246, 0)";
 
     // Constants for shockwave influence
     const shockwaveThreshold = 20;
@@ -260,7 +275,11 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement | null>
         const oscillation = (Math.cos(elapsed * Math.PI * 2) + 1) / 2;
         pulse.opacity = pulse.initialOpacity * (1 - elapsed) * oscillation;
         pulse.radius += pulse.speed;
-        if (pulse.opacity <= 0.02 || pulse.radius >= pulse.maxRadius || elapsed > 1.5) {
+        if (
+          pulse.opacity <= 0.02 ||
+          pulse.radius >= pulse.maxRadius ||
+          elapsed > 1.5
+        ) {
           pulses.current.splice(i, 1);
         } else {
           ctx.beginPath();
@@ -273,7 +292,8 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement | null>
 
       // Occasionally generate new pulses and particles with dynamic scaling
       if (nodes.current.length > 0 && Math.random() < 0.005) {
-        const scaleFactor = (dimensions.width * dimensions.height) / REFERENCE_AREA;
+        const scaleFactor =
+          (dimensions.width * dimensions.height) / REFERENCE_AREA;
         const randomIndex = Math.floor(Math.random() * nodes.current.length);
         const randomNode = nodes.current[randomIndex];
         pulses.current.push({
@@ -317,7 +337,7 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement | null>
         }
       }
 
-      // Update and draw shockwaves, and apply their impulse to nodes
+      // Update and draw shockwaves; also apply their impulse to nodes
       for (let i = shockwaves.current.length - 1; i >= 0; i--) {
         const sw = shockwaves.current[i];
         sw.radius += sw.speed;
@@ -359,7 +379,12 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement | null>
             ctx.beginPath();
             ctx.moveTo(node.x, node.y);
             ctx.lineTo(mousePosRef.current.x, mousePosRef.current.y);
-            const grad = ctx.createLinearGradient(node.x, node.y, mousePosRef.current.x, mousePosRef.current.y);
+            const grad = ctx.createLinearGradient(
+              node.x,
+              node.y,
+              mousePosRef.current.x,
+              mousePosRef.current.y
+            );
             grad.addColorStop(0, gradientStart);
             grad.addColorStop(1, gradientEnd);
             ctx.strokeStyle = grad;
@@ -376,7 +401,7 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement | null>
           node.vy += dyOrigin * 0.002;
         }
 
-        // Update node position with jitter and friction
+        // Update node position with slight jitter and friction
         node.vx += (Math.random() - 0.5) * 0.001;
         node.vy += (Math.random() - 0.5) * 0.001;
         node.x += node.vx;
@@ -388,11 +413,21 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement | null>
 
         // Enhanced glow: increase multiplier from 5 to 7
         const pulseFactor = 1 + 0.2 * Math.sin(now / 500 + i);
-        const isNearMouse = mouseActive.current &&
-          Math.hypot(mousePosRef.current.x - node.x, mousePosRef.current.y - node.y) < config.glowRadius;
+        const isNearMouse =
+          mouseActive.current &&
+          Math.hypot(
+            mousePosRef.current.x - node.x,
+            mousePosRef.current.y - node.y
+          ) < config.glowRadius;
         if (isNearMouse) {
           ctx.beginPath();
-          ctx.arc(node.x, node.y, node.radius * pulseFactor * 7, 0, Math.PI * 2);
+          ctx.arc(
+            node.x,
+            node.y,
+            node.radius * pulseFactor * 7,
+            0,
+            Math.PI * 2
+          );
           ctx.fillStyle = "rgba(124,58,237,0.5)";
           ctx.fill();
         }
@@ -416,7 +451,7 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement | null>
         ctx.fillStyle = gradNode;
         ctx.fill();
 
-        // Draw connections
+        // Draw connections between nodes
         for (let j = i + 1; j < nodes.current.length; j++) {
           const other = nodes.current[j];
           const dxNodes = node.x - other.x;
@@ -427,8 +462,12 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement | null>
             ctx.moveTo(node.x, node.y);
             ctx.lineTo(other.x, other.y);
             const opacity = (1 - distance / config.connectionDistance) * 0.2;
-            const otherNearMouse = mouseActive.current &&
-              Math.hypot(mousePosRef.current.x - other.x, mousePosRef.current.y - other.y) < config.glowRadius;
+            const otherNearMouse =
+              mouseActive.current &&
+              Math.hypot(
+                mousePosRef.current.x - other.x,
+                mousePosRef.current.y - other.y
+              ) < config.glowRadius;
             ctx.strokeStyle =
               isNearMouse || otherNearMouse
                 ? `rgba(124,58,237,${(opacity * 2).toFixed(2)})`
@@ -448,7 +487,7 @@ const useNeuralAnimation = (canvasRef: React.RefObject<HTMLCanvasElement | null>
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [dimensions, canvasRef, isDark]);
+  }, [dimensions, canvasRef, isDark, config]);
 
 };
 
