@@ -5,8 +5,9 @@ import ProjectCard from "../../components/ProjectCard";
 import { NeuralBackground } from "@/components/NeuralBackground";
 import { client } from "@/lib/sanityClient";
 import { PortableText } from "@portabletext/react";
-import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useState, useEffect } from "react";
+import { PortableTextBlock } from "@portabletext/types";
 
 // -----------------------------------------------------
 // 💀🔥 Interface for Project Structure
@@ -14,27 +15,26 @@ import Image from "next/image";
 interface Project {
   _id: string;
   title: string;
-  description: any; // Portable Text block from Sanity
+  description: PortableTextBlock[];
   link: string;
   image: string;
   techStack: string[];
 }
 
 // -----------------------------------------------------
-// 💀🔥 TypeScript Props for ProjectCard
+// 💀🔥 ProjectCard Props Interface
 // -----------------------------------------------------
-type ProjectProps = {
-  readonly title: string;
-  readonly description: React.ReactNode;
-  readonly link: string;
-  readonly image: string;
-  readonly techStack?: string[];
-};
+interface ProjectCardProps {
+  title: string;
+  description: React.ReactNode;
+  link: string;
+  image: string;
+  techStack?: string[];
+}
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<boolean>(false);
 
   // -----------------------------------------------------
   // 💀🔥 Fetch projects from Sanity CMS with error logging
@@ -47,7 +47,6 @@ export default function Projects() {
         setProjects(data);
       } catch (error) {
         console.error("🔥 Error fetching projects from Sanity:", error);
-        setError(true);
       } finally {
         setLoading(false);
       }
@@ -69,14 +68,6 @@ export default function Projects() {
         ease: "easeOut",
       },
     }),
-  };
-
-  // -----------------------------------------------------
-  // 💀🔥 Handle Image Source (Supports both local & external)
-  // -----------------------------------------------------
-  const getImageSrc = (image: string) => {
-    if (image.startsWith("http")) return image;
-    return `/images/${image}`;
   };
 
   return (
@@ -110,17 +101,6 @@ export default function Projects() {
           </motion.div>
         )}
 
-        {/* 💀🔥 Error Handler */}
-        {error && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-red-500 text-center"
-          >
-            💀 Error fetching projects. Please try again later.
-          </motion.div>
-        )}
-
         {/* 💀🔥 Projects Grid */}
         <motion.div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -141,13 +121,9 @@ export default function Projects() {
                 }
                 link={project.link}
                 image={
-                  <Image
-                    src={getImageSrc(project.image)}
-                    alt={project.title}
-                    width={500}
-                    height={300}
-                    className="rounded-lg"
-                  />
+                  project.image.startsWith("http")
+                    ? project.image
+                    : `/images/${project.image}`
                 }
                 techStack={project.techStack}
               />
