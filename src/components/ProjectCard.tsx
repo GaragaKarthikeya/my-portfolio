@@ -1,14 +1,12 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 
-interface ProjectCardProps {
+interface ProjectProps {
   title: string;
-  description: React.ReactNode; // 💀🔥 Accepts JSX/React Components
+  description: React.ReactNode;
   link: string;
   image: string;
-  techStack: string[];
+  techStack?: string[];
 }
 
 export default function ProjectCard({
@@ -17,36 +15,30 @@ export default function ProjectCard({
   link,
   image,
   techStack,
-}: ProjectCardProps) {
+}: ProjectProps) {
   return (
-    <div className="bg-gray-100 dark:bg-gray-800 p-5 rounded-xl shadow-xl">
+    <div className="p-5 rounded-lg shadow-lg bg-white dark:bg-gray-800">
       <Image
         src={image}
+        width={400}
+        height={250}
         alt={title}
-        width={500}
-        height={300}
-        className="rounded-lg"
+        className="rounded-md"
       />
-      <h2 className="text-2xl font-bold mt-4">{title}</h2>
-      <div className="text-gray-600 dark:text-gray-300 my-2">
-        {description} {/* 💀🔥 Now supports JSX */}
-      </div>
-      <div className="flex flex-wrap gap-2 my-3">
-        {techStack.map((tech, index) => (
+      <h3 className="text-xl font-bold my-2">{title}</h3>
+      <div className="text-sm text-gray-600 dark:text-gray-300">{description}</div>
+      <div className="mt-4">
+        {techStack?.map((tech) => (
           <span
-            key={index}
-            className="text-sm bg-blue-500 text-white px-2 py-1 rounded-md"
+            key={tech}
+            className="bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100 text-xs px-2 py-1 rounded-full mr-2"
           >
             {tech}
           </span>
         ))}
       </div>
-      <Link
-        href={link}
-        target="_blank"
-        className="text-blue-500 font-bold underline mt-3 inline-block"
-      >
-        🔗 View Project
+      <Link href={link} className="mt-3 inline-block text-blue-500">
+        🔥 View Project
       </Link>
     </div>
   );
