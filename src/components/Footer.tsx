@@ -4,6 +4,13 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import { useRef, useState, useEffect, memo } from 'react';
 import emailjs from '@emailjs/browser';
 
+// Define a proper type for the gtag function
+type GtagFunction = (
+  command: string,
+  eventName: string,
+  eventParams?: Record<string, unknown>
+) => void;
+
 interface FormState {
   isLoading: boolean;
   isSuccess: boolean;
@@ -131,15 +138,15 @@ export default function Footer() {
     return re.test(email);
   };
 
+  // Track analytics event using our defined GtagFunction type
   const trackAnalyticsEvent = (eventName: string) => {
     if (typeof window !== 'undefined' && 'gtag' in window) {
-      (window as typeof window & { gtag?: GtagFunction }).gtag?.('event', eventName, {
+      (window as Window & { gtag?: GtagFunction }).gtag?.('event', eventName, {
         event_category: 'engagement',
         event_label: 'Newsletter Subscription',
       });
     }
   };
-  
 
   const slideIn = {
     hidden: { opacity: 0, y: 20 },
