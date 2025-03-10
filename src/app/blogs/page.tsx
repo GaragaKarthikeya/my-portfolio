@@ -1,60 +1,69 @@
 "use client";
+
 import blogs from "../../lib/blogs.json";
 import BlogCard from "../../components/BlogCard";
 import { motion } from "framer-motion";
+import { NeuralBackground } from "@/components/NeuralBackground";
 
 export default function BlogsPage() {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
-      className="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8"
-    >
-      {/* Animated Heading */}
-      <motion.h1
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
-        className="text-4xl md:text-5xl font-bold text-center text-gray-800 dark:text-gray-100 mb-12"
-      >
-        My Blogs
-      </motion.h1>
+    <>
+      {/* Neural Network Background */}
+      <NeuralBackground />
 
-      {/* Blogs Grid */}
-      <motion.div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto"
-        initial="hidden"
-        animate="visible"
-        variants={{
-          hidden: { opacity: 0, y: 20 },
-          visible: {
-            opacity: 1,
-            y: 0,
-            transition: { staggerChildren: 0.2 },
-          },
-        }}
-      >
-        {blogs.map((blog, index) => (
-          <motion.div
-            key={index}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0 },
-            }}
-            transition={{ duration: 0.3 }}
-          >
-            <BlogCard
-              title={blog.title}
-              description={blog.description}
-              link={blog.link}
-              date={blog.date}
-            />
-          </motion.div>
-        ))}
-      </motion.div>
-    </motion.div>
+      {/* Ultra Glossy Content Container */}
+      <div className="relative z-10 min-h-screen bg-transparent py-12 px-4 sm:px-6 lg:px-8">
+        {/* Animated Heading Container */}
+        <motion.div
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="w-full max-w-4xl mx-auto mb-12 p-1 bg-gradient-to-r from-blue-400 to-purple-600 rounded-2xl shadow-2xl"
+        >
+          <div className="rounded-2xl p-10 bg-gray-200 dark:bg-gray-800 backdrop-blur-sm">
+            <h1 className="text-4xl md:text-5xl font-bold text-center text-gray-800 dark:text-gray-100">
+              My Blogs
+            </h1>
+          </div>
+        </motion.div>
+
+        {/* Blogs Grid Container */}
+        <motion.div
+          className="w-full max-w-6xl mx-auto p-1 bg-gradient-to-r from-blue-400 to-purple-600 rounded-2xl shadow-2xl"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0, y: 20 },
+            visible: {
+              opacity: 1,
+              y: 0,
+              transition: { staggerChildren: 0.2 },
+            },
+          }}
+        >
+          <div className="rounded-2xl p-8 bg-gray-200 dark:bg-gray-800 backdrop-blur-sm grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {blogs.map((blog, index) => (
+              <motion.div
+                key={index}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+                transition={{ duration: 0.3 }}
+              >
+                <BlogCard
+                  title={blog.title}
+                  description={blog.description}
+                  link={blog.link}
+                  date={blog.date}
+                />
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </>
   );
 }
