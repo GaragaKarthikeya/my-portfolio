@@ -5,7 +5,6 @@ import ProjectCard from "../../components/ProjectCard";
 import { NeuralBackground } from "@/components/NeuralBackground";
 import { client } from "@/lib/sanityClient";
 import { PortableText } from "@portabletext/react";
-import Image from "next/image";
 import { useState, useEffect } from "react";
 import { PortableTextBlock } from "@portabletext/types";
 
@@ -19,17 +18,6 @@ interface Project {
   link: string;
   image: string;
   techStack: string[];
-}
-
-// -----------------------------------------------------
-// 💀🔥 ProjectCard Props Interface
-// -----------------------------------------------------
-interface ProjectCardProps {
-  title: string;
-  description: React.ReactNode;
-  link: string;
-  image: string;
-  techStack?: string[];
 }
 
 export default function Projects() {
