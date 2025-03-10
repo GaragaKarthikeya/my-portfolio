@@ -1,87 +1,53 @@
-import Image from 'next/image';
-import type { FC } from 'react';
+"use client";
 
-type ProjectProps = {
-  readonly title: string;
-  readonly description: string;
-  readonly link: string;
-  readonly image: string;
-  readonly techStack?: string[];
-};
+import Image from "next/image";
+import Link from "next/link";
 
-const ProjectCard: FC<ProjectProps> = ({
+interface ProjectCardProps {
+  title: string;
+  description: React.ReactNode; // 💀🔥 Accepts JSX/React Components
+  link: string;
+  image: string;
+  techStack: string[];
+}
+
+export default function ProjectCard({
   title,
   description,
   link,
   image,
-  techStack = [],
-}) => {
+  techStack,
+}: ProjectCardProps) {
   return (
-    <article className="group relative bg-white/70 dark:bg-gray-700/70 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden backdrop-blur-sm border border-white/40 dark:border-gray-700/50">
-      {/* Image Container */}
-      <div className="relative w-full h-48 sm:h-56 md:h-64 aspect-video">
-        <Image
-          src={image}
-          alt={`Screenshot of ${title} project`}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover object-top transition-transform duration-300 group-hover:scale-105"
-          quality={85}
-        />
+    <div className="bg-gray-100 dark:bg-gray-800 p-5 rounded-xl shadow-xl">
+      <Image
+        src={image}
+        alt={title}
+        width={500}
+        height={300}
+        className="rounded-lg"
+      />
+      <h2 className="text-2xl font-bold mt-4">{title}</h2>
+      <div className="text-gray-600 dark:text-gray-300 my-2">
+        {description} {/* 💀🔥 Now supports JSX */}
       </div>
-
-      {/* Content Container */}
-      <div className="p-6 space-y-4">
-        <header>
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-            {title}
-          </h3>
-        </header>
-
-        <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed line-clamp-3">
-          {description}
-        </p>
-
-        {techStack.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {techStack.map((tech) => (
-              <span
-                key={tech}
-                className="px-2 py-1 text-xs font-mono bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded"
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-        )}
-
-        <footer>
-          <a
-            href={link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-colors duration-200"
-            aria-label={`View ${title} project (opens in new tab)`}
+      <div className="flex flex-wrap gap-2 my-3">
+        {techStack.map((tech, index) => (
+          <span
+            key={index}
+            className="text-sm bg-blue-500 text-white px-2 py-1 rounded-md"
           >
-            <span>View Project</span>
-            <svg
-              className="ml-2 w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-              />
-            </svg>
-          </a>
-        </footer>
+            {tech}
+          </span>
+        ))}
       </div>
-    </article>
+      <Link
+        href={link}
+        target="_blank"
+        className="text-blue-500 font-bold underline mt-3 inline-block"
+      >
+        🔗 View Project
+      </Link>
+    </div>
   );
-};
-
-export default ProjectCard;
+}
