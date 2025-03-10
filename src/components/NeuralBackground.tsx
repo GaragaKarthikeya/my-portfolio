@@ -1,12 +1,6 @@
-    "use client";
+"use client";
 
 import React, { useState, useEffect, useRef, useCallback, FC } from "react";
-
-// ---------------------------------------------------------------------------
-// Style Constants
-// ---------------------------------------------------------------------------
-const glassPanelStyles =
-  "rounded-3xl backdrop-blur-md bg-white/25 dark:bg-gray-900/25 border border-white/20 dark:border-gray-700/20 shadow-xl";
 
 // ---------------------------------------------------------------------------
 // Types & Custom Hook: useNeuralAnimation
