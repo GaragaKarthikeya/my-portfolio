@@ -16,7 +16,7 @@ const buttonStyles =
   "rounded-full font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105";
 
 // ---------------------------------------------------------------------------
-// Page Sections (Hero, About, etc.)
+// HeroSection Component
 // ---------------------------------------------------------------------------
 const HeroSection: FC = () => (
   <section className="relative flex items-center justify-center min-h-screen px-4 py-10 z-10">
@@ -57,7 +57,7 @@ const HeroSection: FC = () => (
       </motion.p>
       <motion.div
         initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ delay: 0.7, duration: 0.5 }}
         className="flex justify-center space-x-6 mb-10"
       >
@@ -79,17 +79,26 @@ const HeroSection: FC = () => (
       </motion.div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ delay: 0.9, duration: 0.8 }}
         className="flex flex-wrap justify-center gap-4"
       >
-        <Link href="/about" className={`${buttonStyles} bg-blue-500 text-white hover:bg-blue-600 px-8 py-3`}>
+        <Link
+          href="/about"
+          className={`${buttonStyles} bg-blue-500 text-white hover:bg-blue-600 px-8 py-3`}
+        >
           About Me
         </Link>
-        <Link href="/projects" className={`${buttonStyles} bg-green-500 text-white hover:bg-green-600 px-8 py-3`}>
+        <Link
+          href="/projects"
+          className={`${buttonStyles} bg-green-500 text-white hover:bg-green-600 px-8 py-3`}
+        >
           Projects
         </Link>
-        <Link href="/contact" className={`${buttonStyles} bg-blue-500 text-white hover:bg-blue-600 px-8 py-3`}>
+        <Link
+          href="/contact"
+          className={`${buttonStyles} bg-blue-500 text-white hover:bg-blue-600 px-8 py-3`}
+        >
           Contact
         </Link>
         <a
@@ -107,6 +116,9 @@ const HeroSection: FC = () => (
   </section>
 );
 
+// ---------------------------------------------------------------------------
+// Home Component
+// ---------------------------------------------------------------------------
 const Home: FC = () => {
   const [mounted, setMounted] = useState(false);
 
@@ -117,7 +129,7 @@ const Home: FC = () => {
   if (!mounted) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500" />
       </div>
     );
   }
@@ -127,7 +139,7 @@ const Home: FC = () => {
       <NeuralBackground />
       <div className="relative z-10 flex flex-col min-h-screen bg-transparent text-gray-800 dark:text-gray-100">
         <HeroSection />
-        {/* You can add other sections (About, Skills, Timeline, CTA, etc.) here */}
+        {/* Additional sections can be added here */}
       </div>
     </div>
   );
