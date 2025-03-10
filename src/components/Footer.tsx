@@ -131,15 +131,15 @@ export default function Footer() {
     return re.test(email);
   };
 
-  // Use a type cast to bypass conflicting gtag declarations.
   const trackAnalyticsEvent = (eventName: string) => {
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', eventName, {
+    if (typeof window !== 'undefined' && 'gtag' in window) {
+      (window as typeof window & { gtag?: GtagFunction }).gtag?.('event', eventName, {
         event_category: 'engagement',
         event_label: 'Newsletter Subscription',
       });
     }
   };
+  
 
   const slideIn = {
     hidden: { opacity: 0, y: 20 },
