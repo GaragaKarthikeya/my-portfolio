@@ -1,11 +1,11 @@
-import Image, { type StaticImageData } from 'next/image';
+import Image from 'next/image';
 import type { FC } from 'react';
 
 type ProjectProps = {
   readonly title: string;
   readonly description: string;
   readonly link: string;
-  readonly image: string | StaticImageData;
+  readonly image: string;
   readonly techStack?: string[];
 };
 
@@ -27,7 +27,6 @@ const ProjectCard: FC<ProjectProps> = ({
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover object-top transition-transform duration-300 group-hover:scale-105"
           quality={85}
-          placeholder={typeof image === 'string' ? 'empty' : 'blur'}
         />
       </div>
 

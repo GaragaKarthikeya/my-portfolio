@@ -1,11 +1,38 @@
 "use client";
 
 import { motion } from "framer-motion";
-import projects from "../../lib/projects.json";
 import ProjectCard from "../../components/ProjectCard";
 import { NeuralBackground } from "@/components/NeuralBackground";
+import { client } from "@/lib/sanityClient";
+import { useState, useEffect } from "react";
+
+interface Project {
+  _id: string;
+  title: string;
+  description: string;
+  link: string;
+  image: string;
+  techStack: string[];
+}
 
 export default function Projects() {
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  // Fetch projects from Sanity CMS with error logging
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const query = `*[_type == "project"]`;
+        const data = await client.fetch(query);
+        setProjects(data);
+      } catch (error) {
+        console.error("Error fetching projects from Sanity:", error);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
   return (
     <>
       {/* Neural Network Background */}
@@ -13,7 +40,6 @@ export default function Projects() {
 
       {/* Ultra Glossy Content Container */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen bg-transparent px-4 py-12">
-        {/* Heading Container */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -27,38 +53,18 @@ export default function Projects() {
           </div>
         </motion.div>
 
-        {/* Projects Grid Container */}
-        <motion.div
-          className="w-full max-w-6xl p-1 bg-gradient-to-r from-blue-400 to-purple-600 rounded-2xl shadow-2xl"
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: {},
-            visible: { transition: { staggerChildren: 0.2 } },
-          }}
-        >
-          <div className="rounded-2xl p-8 bg-gray-200 dark:bg-gray-800 backdrop-blur-sm">
-            <motion.div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.map((project) => (
-                <motion.div
-                  key={project.title}
-                  variants={{
-                    hidden: { opacity: 0, y: 20 },
-                    visible: { opacity: 1, y: 0 },
-                  }}
-                  whileHover={{ scale: 1.05 }}
-                  className="transition-transform duration-300"
-                >
-                  <ProjectCard
-                    title={project.title}
-                    description={project.description}
-                    link={project.link}
-                    image={project.image}
-                  />
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
+        {/* Projects Grid */}
+        <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {projects.map((project) => (
+            <ProjectCard
+              key={project._id}
+              title={project.title}
+              description={project.description}
+              link={project.link}
+              image={project.image}
+              techStack={project.techStack}
+            />
+          ))}
         </motion.div>
       </div>
     </>
