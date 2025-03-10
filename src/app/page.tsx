@@ -3,13 +3,9 @@
 import React, { useState, useEffect, FC } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image"; // ✅ Using Next.js optimized Image
 import Typewriter from "typewriter-effect";
 import { FaGithub, FaLinkedin, FaTwitter, FaArrowDown } from "react-icons/fa";
 import { NeuralBackground } from "../components/NeuralBackground";
-
-// ✅ Import your favicon like a king 👑
-import favicon from "@/app/favicon.ico";
 
 // ---------------------------------------------------------------------------
 // Style Constants
@@ -30,19 +26,18 @@ const HeroSection: FC = () => (
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
     >
-      {/* ✅ Fixed: Use Next.js Image component */}
+      {/* Profile Photo Container */}
       <motion.div
         className="relative w-32 h-32 mx-auto mb-8 rounded-full overflow-hidden shadow-xl bg-gradient-to-br from-blue-400 to-purple-500 ring-4 ring-white/50 dark:ring-gray-800/50"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
       >
-        <Image
-          src={favicon}
+        {/* Use a standard <img> tag for the favicon (placed in public/images) */}
+        <img
+          src="/images/favicon.ico"
           alt="Profile Photo"
-          width={128}
-          height={128}
-          className="object-cover"
+          className="object-cover w-full h-full"
         />
       </motion.div>
 
@@ -71,7 +66,6 @@ const HeroSection: FC = () => (
         I blend VLSI design expertise with modern web development to create tomorrow's technologies.
       </motion.p>
 
-      {/* ✅ Social Links */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1 }}
@@ -88,13 +82,50 @@ const HeroSection: FC = () => (
             href={social.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-3 rounded-full bg-white/50 dark:bg-gray-800/50 shadow-md hover:shadow-lg transform hover:scale-110 transition-all backdrop-blur-sm"
+            className="p-3 rounded-full bg-white/50 dark:bg-gray-800/50 shadow-md hover:shadow-lg text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transform hover:scale-110 transition-all backdrop-blur-sm"
           >
             {social.icon}
           </a>
         ))}
       </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.9, duration: 0.8 }}
+        className="flex flex-wrap justify-center gap-4"
+      >
+        <Link
+          href="/about"
+          className={`${buttonStyles} bg-blue-500 text-white hover:bg-blue-600 px-8 py-3`}
+        >
+          About Me
+        </Link>
+        <Link
+          href="/projects"
+          className={`${buttonStyles} bg-green-500 text-white hover:bg-green-600 px-8 py-3`}
+        >
+          Projects
+        </Link>
+        <Link
+          href="/contact"
+          className={`${buttonStyles} bg-blue-500 text-white hover:bg-blue-600 px-8 py-3`}
+        >
+          Contact
+        </Link>
+        <a
+          href="/resume.pdf"
+          target="_blank"
+          className={`${buttonStyles} border-2 border-blue-500 text-blue-500 dark:text-blue-400 hover:bg-blue-500 hover:text-white px-8 py-3`}
+        >
+          Resume
+        </a>
+      </motion.div>
     </motion.div>
+
+    <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+      <FaArrowDown className="text-gray-600 dark:text-gray-400" />
+    </div>
   </section>
 );
 
