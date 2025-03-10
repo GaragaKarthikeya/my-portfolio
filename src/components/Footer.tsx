@@ -11,17 +11,10 @@ interface FormState {
   successMessage: string | null;
 }
 
-// Add type declaration for gtag
-declare global {
-  interface Window {
-    gtag?: (command: string, action: string, params: object) => void;
-  }
-}
-
 export default function Footer() {
   const form = useRef<HTMLFormElement>(null);
   const { scrollYProgress } = useScroll();
-  // Change the mapping to cover full scroll progress
+  // Map full scroll progress
   const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
   const creationYear = 2024;
   const currentYear = new Date().getFullYear();
@@ -36,7 +29,7 @@ export default function Footer() {
   const [inputFocused, setInputFocused] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
 
-  // Retrieve stored emails
+  // Load subscribed emails from localStorage
   useEffect(() => {
     try {
       const storedEmails = localStorage.getItem('subscribedEmails');
@@ -48,12 +41,11 @@ export default function Footer() {
     }
   }, []);
 
-  // Monitor scroll to show/hide the back-to-top button
+  // Show back-to-top button when scrolling past 300px
   useEffect(() => {
     const handleScroll = () => {
       setShowBackToTop(window.scrollY > 300);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -139,9 +131,10 @@ export default function Footer() {
     return re.test(email);
   };
 
+  // Use a type cast to bypass conflicting gtag declarations.
   const trackAnalyticsEvent = (eventName: string) => {
-    if (typeof window !== 'undefined' && typeof window.gtag !== 'undefined') {
-      window.gtag('event', eventName, {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', eventName, {
         event_category: 'engagement',
         event_label: 'Newsletter Subscription',
       });
@@ -153,11 +146,7 @@ export default function Footer() {
     visible: { 
       opacity: 1,
       y: 0,
-      transition: { 
-        type: 'spring',
-        bounce: 0.4,
-        duration: 0.8
-      }
+      transition: { type: 'spring', bounce: 0.4, duration: 0.8 }
     }
   };
 
@@ -176,11 +165,9 @@ export default function Footer() {
         suppressHydrationWarning
       >
         <div className="absolute inset-0 opacity-5 dark:opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMiIvPjwvc3ZnPg==')]" />
-        
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 relative">
           <div className="flex flex-col items-center space-y-8">
             <div className="h-1 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 w-full mb-8 rounded-full" />
-
             <motion.div 
               className="w-full max-w-xs sm:max-w-md"
               variants={slideIn}
@@ -196,7 +183,6 @@ export default function Footer() {
                   {state.successMessage}
                 </motion.div>
               )}
-
               {state.error && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -206,7 +192,6 @@ export default function Footer() {
                   {state.error}
                 </motion.div>
               )}
-
               <div className="group relative">
                 <form 
                   ref={form} 
@@ -309,9 +294,11 @@ export default function Footer() {
   );
 }
 
-// Back-to-Top Button Component with updated styling
+// Back-to-Top Button with click-to-play sound effect
 const BackToTopButton = () => {
   const handleClick = () => {
+    const audio = new Audio('/sounds/hover.mp3');
+    audio.play().catch(err => console.error('Failed to play sound:', err));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -331,7 +318,6 @@ const BackToTopButton = () => {
   );
 };
 
-// Chevron Up Icon Component for Back-to-Top Button
 const ChevronUpIcon = memo(function ChevronUpIcon() {
   return (
     <svg
@@ -345,10 +331,8 @@ const ChevronUpIcon = memo(function ChevronUpIcon() {
     </svg>
   );
 });
-
 ChevronUpIcon.displayName = 'ChevronUpIcon';
 
-// Social Link Component
 const SocialLink = memo(function SocialLink({ 
   href, 
   children, 
@@ -365,19 +349,12 @@ const SocialLink = memo(function SocialLink({
       rel="noopener noreferrer"
       className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
       aria-label={label}
-      whileHover={{ 
-        scale: 1.1,
-        transition: { type: 'spring', stiffness: 300 }
-      }}
+      whileHover={{ scale: 1.1, transition: { type: 'spring', stiffness: 300 } }}
       whileTap={{ scale: 0.9 }}
       suppressHydrationWarning
     >
       <motion.span
-        whileHover={{
-          rotateY: 10,
-          rotateX: -5,
-          transition: { type: 'spring' }
-        }}
+        whileHover={{ rotateY: 10, rotateX: -5, transition: { type: 'spring' } }}
         className="w-6 h-6 block text-gray-800 dark:text-gray-200"
       >
         {children}
@@ -385,10 +362,8 @@ const SocialLink = memo(function SocialLink({
     </motion.a>
   );
 });
-
 SocialLink.displayName = 'SocialLink';
 
-// Icons (using currentColor to inherit text color)
 const GitHubIcon = memo(function GitHubIcon() {
   return (
     <svg fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
@@ -396,7 +371,6 @@ const GitHubIcon = memo(function GitHubIcon() {
     </svg>
   );
 });
-
 GitHubIcon.displayName = 'GitHubIcon';
 
 const LinkedInIcon = memo(function LinkedInIcon() {
@@ -406,7 +380,6 @@ const LinkedInIcon = memo(function LinkedInIcon() {
     </svg>
   );
 });
-
 LinkedInIcon.displayName = 'LinkedInIcon';
 
 const EmailIcon = memo(function EmailIcon() {
@@ -416,7 +389,6 @@ const EmailIcon = memo(function EmailIcon() {
     </svg>
   );
 });
-
 EmailIcon.displayName = 'EmailIcon';
 
 const SpinnerIcon = memo(function SpinnerIcon() {
@@ -443,5 +415,4 @@ const SpinnerIcon = memo(function SpinnerIcon() {
     </svg>
   );
 });
-
 SpinnerIcon.displayName = 'SpinnerIcon';
