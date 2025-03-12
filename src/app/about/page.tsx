@@ -14,16 +14,33 @@ import {
 export default function About() {
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [isMounted, setIsMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
-    const handleMouseMove = (e: MouseEvent) => {
-      setCursorPosition({ x: e.clientX, y: e.clientY });
+
+    // Check if we're on a mobile device
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
     };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    // Only attach mousemove listener if not mobile
+    if (window.innerWidth >= 768) {
+      const handleMouseMove = (e: MouseEvent) => {
+        setCursorPosition({ x: e.clientX, y: e.clientY });
+      };
+      window.addEventListener("mousemove", handleMouseMove);
+      return () => {
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("resize", checkMobile);
+      };
+    } else {
+      return () => {
+        window.removeEventListener("resize", checkMobile);
+      };
+    }
   }, []);
 
   const interestItems = [
@@ -58,9 +75,7 @@ export default function About() {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-      },
+      transition: { staggerChildren: 0.15 },
     },
   };
 
@@ -71,11 +86,11 @@ export default function About() {
 
   return (
     <>
-      {/* Neural Network Background */}
-      <NeuralBackground />
+      {/* Render the heavy NeuralBackground only on non-mobile devices */}
+      {!isMobile && <NeuralBackground />}
 
-      {/* Cursor Effect (only shows on client side) */}
-      {isMounted && (
+      {/* Cursor Effect - only for desktop; clip to circle to avoid square block shadow */}
+      {isMounted && !isMobile && (
         <div className="pointer-events-none fixed inset-0 z-30" aria-hidden="true">
           <div
             className="absolute w-40 h-40 rounded-full bg-gradient-to-r from-purple-400/20 to-blue-500/20 blur-xl"
@@ -83,6 +98,7 @@ export default function About() {
               left: `${cursorPosition.x - 80}px`,
               top: `${cursorPosition.y - 80}px`,
               transition: "transform 0.1s ease-out",
+              clipPath: "circle(50% at 50% 50%)",
             }}
           />
         </div>
@@ -238,7 +254,7 @@ export default function About() {
           </div>
         </motion.section>
 
-        {/* Learning & Collaboration Sections in a 2-Column Layout */}
+        {/* Learning & Collaboration Sections */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
