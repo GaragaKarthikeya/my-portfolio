@@ -3,8 +3,8 @@
 import { motion } from "framer-motion";
 import ProjectCard from "../../components/ProjectCard";
 import { NeuralBackground } from "@/components/NeuralBackground";
+import { useState, useEffect } from "react";
 
-// We assume you have your project data in a JSON or inline here.
 const projects = [
   {
     title: "Banking Notification App",
@@ -129,61 +129,83 @@ const projects = [
 ];
 
 export default function Projects() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate a fast fetch
+    setTimeout(() => {
+      setLoading(false);
+    }, 600);
+  }, []);
+
+  // Optional: Simple entrance animation for cards
+  const cardVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+  };
+
   return (
     <>
       {/* Neural Background */}
       <NeuralBackground />
 
-      {/* Ultra Glossy Content Container */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen bg-transparent px-4 py-12">
-        {/* Heading */}
-        <motion.div
+      {/* Content Container */}
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-12 bg-transparent">
+        {/* Header */}
+        <motion.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="w-full max-w-4xl p-1 bg-gradient-to-r from-blue-400 to-purple-600 rounded-2xl shadow-2xl mb-8"
+          transition={{ duration: 0.6 }}
+          className="w-full max-w-4xl p-1 bg-gradient-to-r from-blue-500 to-pink-500 rounded-2xl shadow-lg mb-8"
         >
-          <div className="rounded-2xl p-10 bg-gray-200 dark:bg-gray-800 backdrop-blur-sm text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-gray-100 drop-shadow-lg">
-              My Projects
+          <div className="rounded-2xl p-10 bg-white/90 dark:bg-gray-900/80 backdrop-blur-sm text-center">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 drop-shadow">
+              🚀 My Projects
             </h1>
           </div>
-        </motion.div>
+        </motion.header>
 
         {/* Projects Grid */}
-        <motion.div
-          className="w-full max-w-6xl p-1 bg-gradient-to-r from-blue-400 to-purple-600 rounded-2xl shadow-2xl"
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: {},
-            visible: { transition: { staggerChildren: 0.2 } },
-          }}
-        >
-          <div className="rounded-2xl p-8 bg-gray-200 dark:bg-gray-800 backdrop-blur-sm">
-            <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.map((project, index) => (
+        {loading ? (
+          <motion.div
+            className="flex flex-wrap gap-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            {Array(3)
+              .fill(0)
+              .map((_, idx) => (
                 <motion.div
-                  key={project.title}
-                  variants={{
-                    hidden: { opacity: 0, y: 20 },
-                    visible: { opacity: 1, y: 0 },
-                  }}
-                  whileHover={{ scale: 1.05 }}
-                  className="transition-transform duration-300"
-                >
-                  <ProjectCard
-                    title={project.title}
-                    description={project.description}
-                    link={project.link}
-                    image={project.image}
-                    techStack={project.technologies}
-                  />
-                </motion.div>
+                  key={idx}
+                  className="w-80 h-64 rounded-xl bg-gray-300/40 dark:bg-gray-800/60 animate-pulse"
+                />
               ))}
-            </motion.div>
-          </div>
-        </motion.div>
+          </motion.div>
+        ) : (
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8"
+            initial="hidden"
+            animate="visible"
+            transition={{ staggerChildren: 0.2 }}
+          >
+            {projects.map((project) => (
+              <motion.div
+                key={project.title}
+                variants={cardVariants}
+                whileHover={{ scale: 1.05 }}
+                className="transition-transform duration-300"
+              >
+                <ProjectCard
+                  title={project.title}
+                  description={project.description}
+                  link={project.link}
+                  image={project.image}
+                  techStack={project.technologies}
+                />
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
       </div>
     </>
   );

@@ -1,6 +1,5 @@
 import Image, { type StaticImageData } from "next/image";
 import type { FC } from "react";
-import Link from "next/link";
 
 type ProjectProps = {
   readonly title: string;
@@ -19,7 +18,7 @@ const ProjectCard: FC<ProjectProps> = ({
 }) => {
   return (
     <article className="group bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
-      {/* Image Container with improved aspect ratio */}
+      {/* Image Container */}
       <div className="relative w-full h-48 sm:h-56 md:h-64 aspect-video">
         <Image
           src={image}
@@ -32,18 +31,16 @@ const ProjectCard: FC<ProjectProps> = ({
         />
       </div>
 
-      {/* Content Container */}
+      {/* Content */}
       <div className="p-6 space-y-4">
         <header>
           <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
             {title}
           </h3>
         </header>
-
         <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed line-clamp-3">
           {description}
         </p>
-
         {techStack.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {techStack.map((tech) => (
@@ -56,7 +53,6 @@ const ProjectCard: FC<ProjectProps> = ({
             ))}
           </div>
         )}
-
         <footer>
           <a
             href={link}
