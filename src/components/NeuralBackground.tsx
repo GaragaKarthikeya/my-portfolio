@@ -88,7 +88,7 @@ const useNeuralAnimation = (
   // Memoized configuration with mobile optimization
   const config = useMemo(
     () => ({
-      nodeDensity: isMobile ? randomBetween(16000, 18000) : randomBetween(12000, 14000), // Fewer nodes on mobile
+      nodeDensity: isMobile ? randomBetween(16000, 18000) : randomBetween(12000, 14000),
       maxNodes: isMobile
         ? Math.round(randomBetween(50, 60))
         : Math.round(randomBetween(100, 120)),
@@ -233,9 +233,11 @@ const useNeuralAnimation = (
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // Set canvas dimensions
     canvas.width = dimensions.width;
     canvas.height = dimensions.height;
 
+    // Initialize nodes if empty
     if (nodes.current.length === 0) {
       const nodeCount = Math.min(
         Math.floor((dimensions.width * dimensions.height) / config.nodeDensity),
@@ -266,17 +268,23 @@ const useNeuralAnimation = (
 
     const animate = () => {
       const now = Date.now();
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Cache canvas dimensions locally
+      const cw = canvas.width;
+      const ch = canvas.height;
+      ctx.clearRect(0, 0, cw, ch);
       ctx.globalAlpha = 1;
+      // Reset shadow defaults
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
 
-      // Reduced background noise for mobile
+      // Draw background noise
       const noiseCount = isMobile ? 20 : 50;
       ctx.fillStyle = isDark ? "rgba(0, 0, 0, 0.05)" : "rgba(255, 255, 255, 0.05)";
       for (let i = 0; i < noiseCount; i++) {
         ctx.beginPath();
         ctx.arc(
-          Math.random() * canvas.width,
-          Math.random() * canvas.height,
+          Math.random() * cw,
+          Math.random() * ch,
           randomBetween(1, 3),
           0,
           Math.PI * 2
@@ -284,7 +292,7 @@ const useNeuralAnimation = (
         ctx.fill();
       }
 
-      // Update and draw pulses with trail
+      // Update and draw pulses
       for (let i = pulses.current.length - 1; i >= 0; i--) {
         const pulse = pulses.current[i];
         const elapsed = (now - pulse.startTime) / 1000;
@@ -312,11 +320,10 @@ const useNeuralAnimation = (
         }
       }
 
-      // Generate pulses and particle bursts with mobile adjustment
+      // Generate pulses and particle bursts (mobile adjustment)
       const pulseProbability = isMobile ? 0.0075 : 0.015;
       if (nodes.current.length > 0 && Math.random() < pulseProbability) {
-        const scaleFactor =
-          (dimensions.width * dimensions.height) / REFERENCE_AREA;
+        const scaleFactor = (cw * ch) / REFERENCE_AREA;
         const randomIndex = Math.floor(Math.random() * nodes.current.length);
         const randomNode = nodes.current[randomIndex];
         pulses.current.push({
@@ -344,7 +351,7 @@ const useNeuralAnimation = (
         }
       }
 
-      // Update and draw particles with trails
+      // Update and draw particles
       for (let i = particles.current.length - 1; i >= 0; i--) {
         const p = particles.current[i];
         p.x += p.vx;
@@ -355,7 +362,13 @@ const useNeuralAnimation = (
         p.vy *= 0.98;
 
         ctx.beginPath();
-        ctx.arc(p.x - p.vx * 0.5, p.y - p.vy * 0.5, p.size * 0.5, 0, Math.PI * 2);
+        ctx.arc(
+          p.x - p.vx * 0.5,
+          p.y - p.vy * 0.5,
+          p.size * 0.5,
+          0,
+          Math.PI * 2
+        );
         ctx.fillStyle = `rgba(124,58,237,${(p.opacity * 0.3).toFixed(2)})`;
         ctx.fill();
 
@@ -368,7 +381,7 @@ const useNeuralAnimation = (
         }
       }
 
-      // Update and draw shockwaves with particle burst
+      // Update and draw shockwaves
       for (let i = shockwaves.current.length - 1; i >= 0; i--) {
         const sw = shockwaves.current[i];
         sw.radius += sw.speed;
@@ -407,7 +420,7 @@ const useNeuralAnimation = (
         }
       }
 
-      // Update nodes with enhanced effects
+      // Update nodes and render with enhanced effects
       nodes.current.forEach((node, i) => {
         if (mouseActive.current) {
           const dx = mousePosRef.current.x - node.x;
@@ -429,7 +442,7 @@ const useNeuralAnimation = (
             grad.addColorStop(0, gradientStart);
             grad.addColorStop(1, gradientEnd);
             ctx.strokeStyle = grad;
-            ctx.lineWidth = (config.interactionRadius - dist) / config.interactionRadius * 2;
+            ctx.lineWidth = ((config.interactionRadius - dist) / config.interactionRadius) * 2;
             ctx.stroke();
           }
         }
@@ -440,24 +453,25 @@ const useNeuralAnimation = (
           node.vx += dxOrigin * 0.003;
           node.vy += dyOrigin * 0.003;
         }
-
         node.vx += (Math.random() - 0.5) * 0.002;
         node.vy += (Math.random() - 0.5) * 0.002;
         node.x += node.vx;
         node.y += node.vy;
-        if (node.x < 0 || node.x > canvas.width) node.vx = -node.vx * 0.9;
-        if (node.y < 0 || node.y > canvas.height) node.vy = -node.vy * 0.9;
+        if (node.x < 0 || node.x > cw) node.vx = -node.vx * 0.9;
+        if (node.y < 0 || node.y > ch) node.vy = -node.vy * 0.9;
         node.vx *= config.friction;
         node.vy *= config.friction;
 
         const pulseFactor = 1 + 0.3 * Math.sin(now / 400 + i);
         const isNearMouse =
           mouseActive.current &&
-          Math.hypot(
-            mousePosRef.current.x - node.x,
-            mousePosRef.current.y - node.y
-          ) < config.glowRadius;
+          Math.hypot(mousePosRef.current.x - node.x, mousePosRef.current.y - node.y) <
+            config.glowRadius;
         if (isNearMouse) {
+          // Use shadow settings for a smoother glow
+          ctx.save();
+          ctx.shadowColor = "rgba(124,58,237,0.8)";
+          ctx.shadowBlur = 20;
           ctx.beginPath();
           ctx.arc(node.x, node.y, node.radius * pulseFactor * 12, 0, Math.PI * 2);
           ctx.fillStyle = "rgba(124,58,237,0.2)";
@@ -467,11 +481,16 @@ const useNeuralAnimation = (
           ctx.arc(node.x, node.y, node.radius * pulseFactor * 8, 0, Math.PI * 2);
           ctx.fillStyle = "rgba(124,58,237,0.6)";
           ctx.fill();
+          ctx.restore();
         }
 
         const nodeFill = isNearMouse
-          ? (isDark ? "#f472b6" : "#a855f7")
-          : (isDark ? "#60a5fa" : "#3b82f6");
+          ? isDark
+            ? "#f472b6"
+            : "#a855f7"
+          : isDark
+          ? "#60a5fa"
+          : "#3b82f6";
         const gradNode = ctx.createRadialGradient(
           node.x,
           node.y,
@@ -487,6 +506,7 @@ const useNeuralAnimation = (
         ctx.fillStyle = gradNode;
         ctx.fill();
 
+        // Draw connections between nodes
         for (let j = i + 1; j < nodes.current.length; j++) {
           const other = nodes.current[j];
           const dxNodes = node.x - other.x;
