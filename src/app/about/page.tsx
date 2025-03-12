@@ -4,9 +4,7 @@ import { motion } from "framer-motion";
 import { NeuralBackground } from "@/components/NeuralBackground";
 import { useEffect, useState } from "react";
 import {
-  FaLinkedin,
   FaEnvelope,
-  FaGithub,
   FaCode,
   FaMicrochip,
   FaRocket,
