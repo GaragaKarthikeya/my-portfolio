@@ -3,67 +3,70 @@
 import { motion } from "framer-motion";
 import ProjectCard from "../../components/ProjectCard";
 import { NeuralBackground } from "@/components/NeuralBackground";
-import { client } from "@/lib/sanityClient";
-import { PortableText } from "@portabletext/react";
 import { useState, useEffect } from "react";
-import { PortableTextBlock } from "@portabletext/types";
 
 // -----------------------------------------------------
-// 💀🔥 Interface for Project Structure
+// 🔥 Static Project Data (Instead of Sanity)
 // -----------------------------------------------------
-interface Project {
-  _id: string;
-  title: string;
-  description: PortableTextBlock[];
-  link: string;
-  image: string;
-  techStack: string[];
-}
+const projectData = [
+  {
+    id: "1",
+    title: "AI Chatbot",
+    description: "An advanced AI chatbot built using Next.js, OpenAI API, and Tailwind CSS.",
+    link: "https://github.com/example/chatbot",
+    image: "/images/chatbot.png",
+    techStack: ["Next.js", "OpenAI", "Tailwind CSS"],
+  },
+  {
+    id: "2",
+    title: "E-Commerce Platform",
+    description: "A full-stack e-commerce platform with secure authentication and Stripe integration.",
+    link: "https://github.com/example/ecommerce",
+    image: "/images/ecommerce.png",
+    techStack: ["React", "Node.js", "MongoDB", "Stripe"],
+  },
+  {
+    id: "3",
+    title: "Portfolio Website",
+    description: "A sleek and modern portfolio website with smooth animations and dark mode.",
+    link: "https://github.com/example/portfolio",
+    image: "/images/portfolio.png",
+    techStack: ["Next.js", "Framer Motion", "Tailwind CSS"],
+  },
+];
 
 export default function Projects() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<typeof projectData>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   // -----------------------------------------------------
-  // 💀🔥 Fetch projects from Sanity CMS with error logging
+  // 🔥 Simulating Data Fetching
   // -----------------------------------------------------
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const query = `*[_type == "project"]`;
-        const data = await client.fetch(query);
-        setProjects(data);
-      } catch (error) {
-        console.error("🔥 Error fetching projects from Sanity:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProjects();
+    setTimeout(() => {
+      setProjects(projectData);
+      setLoading(false);
+    }, 1000); // Simulates a 1s delay (remove if unnecessary)
   }, []);
 
   // -----------------------------------------------------
-  // 💀🔥 Animate each project card individually
+  // 🔥 Animation Variants
   // -----------------------------------------------------
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
-      transition: {
-        duration: 0.5,
-        delay: i * 0.15,
-        ease: "easeOut",
-      },
+      transition: { duration: 0.5, delay: i * 0.15, ease: "easeOut" },
     }),
   };
 
   return (
     <>
-      {/* 💀🔥 Neural Network Background */}
+      {/* 🔥 Neural Network Background */}
       <NeuralBackground />
 
-      {/* 💀🔥 Ultra Glossy Container */}
+      {/* 🔥 Glossy Container */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen bg-transparent px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -78,54 +81,44 @@ export default function Projects() {
           </div>
         </motion.div>
 
-        {/* 💀🔥 Loading Animation */}
+        {/* 🔥 Loading Animation */}
         {loading && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="text-xl text-gray-500 dark:text-gray-400"
           >
-            🚀 Fetching Projects...
+            🚀 Loading Projects...
           </motion.div>
         )}
 
-        {/* 💀🔥 Projects Grid */}
+        {/* 🔥 Projects Grid */}
         <motion.div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           initial="hidden"
           animate="visible"
         >
           {projects.map((project, index) => (
-            <motion.div
-              key={project._id}
-              variants={cardVariants}
-              custom={index}
-            >
+            <motion.div key={project.id} variants={cardVariants} custom={index}>
               <ProjectCard
-                key={project._id}
+                key={project.id}
                 title={project.title}
-                description={
-                  <PortableText value={project.description} />
-                }
+                description={project.description}
                 link={project.link}
-                image={
-                  project.image.startsWith("http")
-                    ? project.image
-                    : `/images/${project.image}`
-                }
+                image={project.image}
                 techStack={project.techStack}
               />
             </motion.div>
           ))}
 
-          {/* 💀🔥 Fallback UI if no projects */}
+          {/* 🔥 Fallback UI if no projects found */}
           {projects.length === 0 && !loading && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="text-gray-500 text-center col-span-full"
             >
-              💀 No Projects Found... Upload something cool on Sanity.
+              💀 No Projects Found...
             </motion.div>
           )}
         </motion.div>
