@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: "class", // Enables dark mode using class strategy
+  darkMode: "class", // Enables dark mode via a CSS class
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}", // Include all pages
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}", // Include components
@@ -78,7 +78,8 @@ const config: Config = {
       // Box Shadows
       boxShadow: {
         glass: "0 4px 30px rgba(0, 0, 0, 0.1)",
-        neumorphic: "8px 8px 16px rgba(0,0,0,0.1), -8px -8px 16px rgba(255,255,255,0.5)",
+        neumorphic:
+          "8px 8px 16px rgba(0,0,0,0.1), -8px -8px 16px rgba(255,255,255,0.5)",
         depth: "0 24px 48px -12px rgba(0,0,0,0.18)",
         "inner-lg": "inset 0 2px 4px 0 rgb(0 0 0 / 0.05)",
       },
@@ -110,7 +111,7 @@ const config: Config = {
         },
       },
 
-      // Transition Timing Function
+      // Transition Timing Functions
       transitionTimingFunction: {
         "custom-ease": "cubic-bezier(0.34, 1.56, 0.64, 1)",
       },
@@ -126,9 +127,10 @@ const config: Config = {
   },
   plugins: [
     require("@tailwindcss/forms"), // Adds form plugin
-    require("@tailwindcss/aspect-ratio"), // Adds aspect-ratio plugin
-    require("tailwindcss-animate"), // Adds animation plugin
-    require("@tailwindcss/container-queries"), // Adds container queries plugin
+    require("@tailwindcss/aspect-ratio"), // Adds aspect ratio plugin
+    require("tailwindcss-animate"), // Adds animation utilities
+    require("@tailwindcss/container-queries"), // Adds container queries
+    require("@tailwindcss/line-clamp"), // Enables line-clamp utilities
   ],
 };
 
