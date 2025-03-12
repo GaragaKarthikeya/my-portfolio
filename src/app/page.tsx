@@ -104,6 +104,7 @@ const HeroSection: FC = () => {
           }}
           style={{ perspective: 1000 }}
         >
+          {/* Consider using Next.js' Image component here */}
           <img
             src="/images/favicon.ico"
             alt="Profile Photo"
@@ -179,9 +180,8 @@ const HeroSection: FC = () => {
               ease: "easeInOut",
             }}
           >
-            Welcome to my portfolio—where hardware innovation meets cutting-edge software
-            development. I blend VLSI design expertise with modern web development to create
-            tomorrow's technologies.
+            Welcome to my portfolio—where hardware innovation meets cutting-edge software development.
+            I blend VLSI design expertise with modern web development to create tomorrow's technologies.
           </motion.div>
 
           {/* Decorative elements */}
