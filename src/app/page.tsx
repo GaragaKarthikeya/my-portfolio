@@ -3,6 +3,7 @@
 import React, { useState, useEffect, FC } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import Typewriter from "typewriter-effect";
 import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
 import { NeuralBackground } from "@/components/ui/NeuralBackground";
@@ -104,11 +105,13 @@ const HeroSection: FC = () => {
           }}
           style={{ perspective: 1000 }}
         >
-          {/* Consider using Next.js' Image component here */}
-          <img
+          <Image
             src="/images/favicon.ico"
             alt="Profile Photo"
+            width={200}
+            height={200}
             className="object-cover w-full h-full"
+            priority
           />
           {/* Animated ring */}
           <motion.div

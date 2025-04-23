@@ -113,7 +113,7 @@ const useNeuralAnimation = (
       window.addEventListener("resize", updateDimensions);
       return () => window.removeEventListener("resize", updateDimensions);
     }
-  }, [updateDimensions]);
+  }, [updateDimensions, isMobile]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {

@@ -1,6 +1,5 @@
 "use client";
 
-import { type Blog } from "@/types";
 import { motion } from "framer-motion";
 import BlogCard from "@/components/blog/BlogCard";
 import { NeuralBackground } from "@/components/ui/NeuralBackground";
