@@ -129,8 +129,7 @@ const config: Config = {
     require("@tailwindcss/forms"), // Adds form plugin
     require("@tailwindcss/aspect-ratio"), // Adds aspect ratio plugin
     require("tailwindcss-animate"), // Adds animation utilities
-    require("@tailwindcss/container-queries"), // Adds container queries
-    require("@tailwindcss/line-clamp"), // Enables line-clamp utilities
+    require("@tailwindcss/container-queries") // Adds container queries
   ],
 };
 

@@ -1,19 +1,16 @@
 "use client";
 
-import blogs from "../../lib/blogs.json";
-import BlogCard from "../../components/BlogCard";
+import { type Blog } from "@/types";
 import { motion } from "framer-motion";
-import { NeuralBackground } from "@/components/NeuralBackground";
+import BlogCard from "@/components/blog/BlogCard";
+import { NeuralBackground } from "@/components/ui/NeuralBackground";
+import blogs from "@/constants/blogs.json";
 
 export default function BlogsPage() {
   return (
     <>
-      {/* Neural Network Background */}
       <NeuralBackground />
-
-      {/* Ultra Glossy Content Container */}
       <div className="relative z-10 min-h-screen bg-transparent py-12 px-4 sm:px-6 lg:px-8">
-        {/* Animated Heading Container */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -27,7 +24,6 @@ export default function BlogsPage() {
           </div>
         </motion.div>
 
-        {/* Blogs Grid Container */}
         <motion.div
           className="w-full max-w-6xl mx-auto p-1 bg-gradient-to-r from-blue-400 to-purple-600 rounded-2xl shadow-2xl"
           initial="hidden"

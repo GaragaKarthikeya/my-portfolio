@@ -1,12 +1,9 @@
 import Image, { type StaticImageData } from "next/image";
 import type { FC } from "react";
+import type { Project } from "@/types";
 
-type ProjectProps = {
-  readonly title: string;
-  readonly description: string;
-  readonly link: string;
+type ProjectProps = Omit<Project, 'image'> & {
   readonly image: string | StaticImageData;
-  readonly techStack?: string[];
 };
 
 const ProjectCard: FC<ProjectProps> = ({
@@ -14,7 +11,7 @@ const ProjectCard: FC<ProjectProps> = ({
   description,
   link,
   image,
-  techStack = [],
+  technologies,
 }) => {
   return (
     <article className="group bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
@@ -43,9 +40,9 @@ const ProjectCard: FC<ProjectProps> = ({
           {description}
         </p>
 
-        {techStack.length > 0 && (
+        {technologies.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            {techStack.map((tech) => (
+            {technologies.map((tech) => (
               <span
                 key={tech}
                 className="px-2 py-1 text-xs font-mono bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded"

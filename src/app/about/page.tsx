@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { NeuralBackground } from "@/components/NeuralBackground";
+import { NeuralBackground } from "@/components/ui/NeuralBackground";
 import { useEffect, useState } from "react";
 import {
   FaEnvelope,

@@ -1,0 +1,21 @@
+[
+    {
+      "title": "Understanding React Hooks",
+      "description": "A beginner-friendly guide to using React Hooks in functional components.",
+      "link": "https://example.com/react-hooks",
+      "date": "2024-01-01"
+    },
+    {
+      "title": "Mastering Next.js",
+      "description": "An in-depth guide to building fast, scalable websites with Next.js.",
+      "link": "https://example.com/mastering-nextjs",
+      "date": "2024-02-15"
+    },
+    {
+      "title": "CSS Grid vs Flexbox",
+      "description": "Understand the differences between CSS Grid and Flexbox for responsive layouts.",
+      "link": "https://example.com/css-grid-flexbox",
+      "date": "2024-03-10"
+    }
+  ]
+  

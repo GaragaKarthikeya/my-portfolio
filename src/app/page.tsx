@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Typewriter from "typewriter-effect";
 import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
-import { NeuralBackground } from "../components/NeuralBackground";
+import { NeuralBackground } from "@/components/ui/NeuralBackground";
 
 // ---------------------------------------------------------------------------
 // Style Constants & Animations

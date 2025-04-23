@@ -1,8 +1,8 @@
 "use client";
 import { Analytics } from "@vercel/analytics/react";
-import Footer from "../components/Footer";
-import Navbar from "../components/Navbar";
-import "../styles/globals.css";
+import Footer from "@/components/layout/Footer";
+import Navbar from "@/components/layout/Navbar";
+import "@/styles/globals.css";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -1,21 +1,22 @@
-[
+{
+  "blogs": [
     {
-      "title": "Understanding React Hooks",
-      "description": "A beginner-friendly guide to using React Hooks in functional components.",
-      "link": "https://example.com/react-hooks",
-      "date": "2024-01-01"
+      "title": "Getting Started with VLSI Design",
+      "description": "A comprehensive guide to understanding VLSI design principles and modern tools.",
+      "link": "https://example.com/vlsi-design",
+      "date": "2024-04-01"
     },
     {
-      "title": "Mastering Next.js",
-      "description": "An in-depth guide to building fast, scalable websites with Next.js.",
-      "link": "https://example.com/mastering-nextjs",
-      "date": "2024-02-15"
+      "title": "Machine Learning in Hardware Design",
+      "description": "Exploring the intersection of ML and hardware design optimization.",
+      "link": "https://example.com/ml-hardware",
+      "date": "2024-03-15"
     },
     {
-      "title": "CSS Grid vs Flexbox",
-      "description": "Understand the differences between CSS Grid and Flexbox for responsive layouts.",
-      "link": "https://example.com/css-grid-flexbox",
-      "date": "2024-03-10"
+      "title": "Next.js Portfolio Development",
+      "description": "Building a modern portfolio website with Next.js and Tailwind CSS.",
+      "link": "https://example.com/nextjs-portfolio",
+      "date": "2024-02-28"
     }
   ]
-  
+}
