@@ -36,7 +36,7 @@ const projects = [
       "A tracker that automatically updates financial information by reading notifications.",
     link: "https://github.com/username/notification-tracker",
     image: "/images/project4.png",
-    technologies: ["Android", "Firebase", "Java"],
+    technologies: ["Android", "Java", "SQLite"],
   },
   {
     title: "Digital Design Learning Tool",
@@ -76,7 +76,7 @@ const projects = [
       "An app to log and track physical education activities and fitness progress.",
     link: "https://github.com/username/pe-tracker",
     image: "/images/project9.png",
-    technologies: ["Android", "Firebase", "Health Tracking"],
+    technologies: ["Android", "SQLite", "Health Tracking"],
   },
   {
     title: "Economics Calculator",
