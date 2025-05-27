@@ -1,43 +1,13 @@
 "use client";
 
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  useMemo,
-  FC,
-} from "react";
+import React, { useRef, useEffect, useCallback, useState } from "react";
 
-// Helper: Random value between min and max
-const randomBetween = (min: number, max: number): number =>
-  Math.random() * (max - min) + min;
-
-// Constant: Reference area for dynamic particle scaling (1080p)
-const REFERENCE_AREA = 1920 * 1080;
-
-// Types
-interface NodeType {
+interface Node {
   x: number;
   y: number;
-  radius: number;
   vx: number;
   vy: number;
-  originX: number;
-  originY: number;
-  lastExplosion?: number;
-}
-
-interface Pulse {
-  x: number;
-  y: number;
-  radius: number;
-  maxRadius: number;
-  speed: number;
-  startTime: number;
-  initialOpacity: number;
-  opacity: number;
-  isExplosion?: boolean;
+  life: number;
 }
 
 interface Particle {
@@ -45,517 +15,341 @@ interface Particle {
   y: number;
   vx: number;
   vy: number;
-  size: number;
-  opacity: number;
   life: number;
+  maxLife: number;
 }
 
-interface Shockwave {
-  x: number;
-  y: number;
-  radius: number;
-  maxRadius: number;
-  speed: number;
-  startTime: number;
-  initialOpacity: number;
-  opacity: number;
+interface SystemCapabilities {
+  level: 'low' | 'medium' | 'high';
+  maxFPS: number;
+  devicePixelRatio: number;
+  isMobile: boolean;
 }
 
-// Custom Hook: useNeuralAnimation
-const useNeuralAnimation = (
-  canvasRef: React.RefObject<HTMLCanvasElement | null>
-) => {
-  const [dimensions, setDimensions] = useState(() =>
-    typeof window !== "undefined"
-      ? { width: window.innerWidth, height: window.innerHeight }
-      : { width: 0, height: 0 }
-  );
-  const [isDark, setIsDark] = useState(() =>
-    typeof window !== "undefined"
-      ? window.matchMedia("(prefers-color-scheme: dark)").matches
-      : false
-  );
-  const mousePosRef = useRef({ x: 0, y: 0 });
-  const animationFrameId = useRef<number | null>(null);
-  const nodes = useRef<NodeType[]>([]);
-  const pulses = useRef<Pulse[]>([]);
-  const particles = useRef<Particle[]>([]);
-  const shockwaves = useRef<Shockwave[]>([]);
-  const mouseActive = useRef(false);
+const NeuralBackground: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationFrameRef = useRef<number>();
+  const [capabilities, setCapabilities] = useState<SystemCapabilities>({
+    level: 'medium',
+    maxFPS: 30,
+    devicePixelRatio: 1,
+    isMobile: false
+  });
 
-  const isMobile = dimensions.width < 768;
-
-  // Memoized configuration with mobile optimization
-  const config = useMemo(
-    () => ({
-      nodeDensity: isMobile ? randomBetween(16000, 18000) : randomBetween(12000, 14000),
-      maxNodes: isMobile
-        ? Math.round(randomBetween(50, 60))
-        : Math.round(randomBetween(100, 120)),
-      pulseSpeed: randomBetween(0.5, 0.8),
-      forceMultiplier: randomBetween(0.006, 0.008),
-      friction: randomBetween(0.97, 0.98),
-      interactionRadius: isMobile ? randomBetween(150, 200) : randomBetween(200, 250),
-      glowRadius: (isMobile ? randomBetween(80, 100) : randomBetween(100, 120)) + 30,
-      connectionDistance: isMobile ? 120 : 180,
-    }),
-    [isMobile]
-  );
-
-  const updateDimensions = useCallback(() => {
-    if (typeof window !== "undefined") {
-      setDimensions({ width: window.innerWidth, height: window.innerHeight });
+  // System capability detection
+  const getSystemCapabilities = useCallback((): SystemCapabilities => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/.test(userAgent);
+    const devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    
+    // Conservative performance assessment
+    const hardwareConcurrency = navigator.hardwareConcurrency || 2;
+    const memory = (navigator as any).deviceMemory || 4;
+    
+    let level: 'low' | 'medium' | 'high' = 'low';
+    let maxFPS = 25;
+    
+    if (isMobile) {
+      level = 'low';
+      maxFPS = 20;
+    } else if (hardwareConcurrency >= 8 && memory >= 8) {
+      level = 'high';
+      maxFPS = 60;
+    } else if (hardwareConcurrency >= 4 && memory >= 4) {
+      level = 'medium';
+      maxFPS = 30;
     }
+    
+    return { level, maxFPS, devicePixelRatio, isMobile };
   }, []);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.addEventListener("resize", updateDimensions);
-      return () => window.removeEventListener("resize", updateDimensions);
-    }
-  }, [updateDimensions, isMobile]);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const mq = window.matchMedia("(prefers-color-scheme: dark)");
-      const handleChange = (e: MediaQueryListEvent) => setIsDark(e.matches);
-      mq.addEventListener("change", handleChange);
-      return () => mq.removeEventListener("change", handleChange);
-    }
-  }, []);
-
-  // Mouse events with continuous particle trail
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      mousePosRef.current = { x: e.clientX, y: e.clientY };
-      mouseActive.current = true;
-      if (Math.random() < 0.1) {
-        particles.current.push({
-          x: e.clientX,
-          y: e.clientY,
-          vx: (Math.random() - 0.5) * 3,
-          vy: (Math.random() - 0.5) * 3,
-          size: randomBetween(1, 3),
-          opacity: 0.8,
-          life: randomBetween(20, 40),
-        });
+  // Performance-optimized configuration with improved visibility
+  const getConfig = useCallback((caps: SystemCapabilities) => {
+    const baseConfig = {
+      low: {
+        nodeCount: 4,
+        maxParticles: 3,
+        connectionDistance: 90,
+        frameInterval: 50, // 20 FPS
+        nodeOpacity: 0.4,
+        connectionOpacity: 0.25,
+        particleOpacity: 0.35,
+        nodeSpeed: 0.3,
+        particleSpeed: 0.8,
+        nodeSize: 2,
+        connectionWidth: 0.8
+      },
+      medium: {
+        nodeCount: 8,
+        maxParticles: 6,
+        connectionDistance: 110,
+        frameInterval: 33, // 30 FPS
+        nodeOpacity: 0.5,
+        connectionOpacity: 0.3,
+        particleOpacity: 0.4,
+        nodeSpeed: 0.4,
+        particleSpeed: 1.0,
+        nodeSize: 2.5,
+        connectionWidth: 1.0
+      },
+      high: {
+        nodeCount: 12,
+        maxParticles: 10,
+        connectionDistance: 130,
+        frameInterval: 16, // 60 FPS
+        nodeOpacity: 0.6,
+        connectionOpacity: 0.35,
+        particleOpacity: 0.45,
+        nodeSpeed: 0.5,
+        particleSpeed: 1.2,
+        nodeSize: 3,
+        connectionWidth: 1.2
       }
     };
-    const handleMouseLeave = () => {
-      mouseActive.current = false;
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseleave", handleMouseLeave);
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseleave", handleMouseLeave);
-    };
+    
+    return baseConfig[caps.level];
   }, []);
 
-  // Touch events with burst
-  useEffect(() => {
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length > 0) {
-        const touch = e.touches[0];
-        mousePosRef.current = { x: touch.clientX, y: touch.clientY };
-        mouseActive.current = true;
-      }
-    };
-    const handleTouchEnd = (e: TouchEvent) => {
-      mouseActive.current = false;
-      if (e.changedTouches.length > 0) {
-        const touch = e.changedTouches[0];
-        shockwaves.current.push({
-          x: touch.clientX,
-          y: touch.clientY,
-          radius: 0,
-          maxRadius: 120,
-          speed: 3,
-          startTime: Date.now(),
-          initialOpacity: 0.7,
-          opacity: 0.7,
-        });
-      }
-    };
-    window.addEventListener("touchmove", handleTouchMove);
-    window.addEventListener("touchend", handleTouchEnd);
-    return () => {
-      window.removeEventListener("touchmove", handleTouchMove);
-      window.removeEventListener("touchend", handleTouchEnd);
-    };
-  }, []);
+  // State management
+  const nodesRef = useRef<Node[]>([]);
+  const particlesRef = useRef<Particle[]>([]);
+  const lastFrameTimeRef = useRef(0);
+  const configRef = useRef(getConfig(capabilities));
 
-  // Click events with epic explosion
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const scaleFactor =
-        (dimensions.width * dimensions.height) / REFERENCE_AREA;
-      shockwaves.current.push({
-        x: e.clientX,
-        y: e.clientY,
-        radius: 0,
-        maxRadius: 150,
-        speed: 4,
-        startTime: Date.now(),
-        initialOpacity: 0.8,
-        opacity: 0.8,
+  // Initialize nodes
+  const initializeNodes = useCallback((canvas: HTMLCanvasElement, config: any) => {
+    const nodes: Node[] = [];
+    for (let i = 0; i < config.nodeCount; i++) {
+      nodes.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * config.nodeSpeed,
+        vy: (Math.random() - 0.5) * config.nodeSpeed,
+        life: 1
       });
-      nodes.current.forEach((node) => {
-        const dist = Math.hypot(node.x - e.clientX, node.y - e.clientY);
-        if (dist < 100) {
-          const baseCount = 8;
-          const particleCount = Math.floor(baseCount * scaleFactor);
-          for (let k = 0; k < particleCount; k++) {
-            particles.current.push({
-              x: node.x,
-              y: node.y,
-              vx: (Math.random() - 0.5) * 4,
-              vy: (Math.random() - 0.5) * 4,
-              size: randomBetween(1, 4),
-              opacity: 1,
-              life: randomBetween(30, 50),
-            });
-          }
-          node.x = Math.random() * canvas.width;
-          node.y = Math.random() * canvas.height;
+    }
+    return nodes;
+  }, []);
+
+  // Create particle
+  const createParticle = useCallback((canvas: HTMLCanvasElement, config: any): Particle => {
+    return {
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * config.particleSpeed,
+      vy: (Math.random() - 0.5) * config.particleSpeed,
+      life: 1,
+      maxLife: 300 + Math.random() * 200
+    };
+  }, []);
+
+  // Update nodes
+  const updateNodes = useCallback((nodes: Node[], canvas: HTMLCanvasElement, config: any) => {
+    nodes.forEach(node => {
+      // Update position
+      node.x += node.vx;
+      node.y += node.vy;
+
+      // Boundary reflection
+      if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
+      if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
+
+      // Keep within bounds
+      node.x = Math.max(0, Math.min(canvas.width, node.x));
+      node.y = Math.max(0, Math.min(canvas.height, node.y));
+    });
+  }, []);
+
+  // Update particles
+  const updateParticles = useCallback((particles: Particle[], canvas: HTMLCanvasElement, config: any) => {
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const particle = particles[i];
+      
+      // Update position
+      particle.x += particle.vx;
+      particle.y += particle.vy;
+      
+      // Update life
+      particle.life = Math.max(0, particle.life - 1 / particle.maxLife);
+      
+      // Remove dead particles or those out of bounds
+      if (particle.life <= 0 || 
+          particle.x < -50 || particle.x > canvas.width + 50 ||
+          particle.y < -50 || particle.y > canvas.height + 50) {
+        particles.splice(i, 1);
+      }
+    }
+    
+    // Add new particles occasionally with better frequency
+    if (particles.length < config.maxParticles && Math.random() < 0.008) {
+      particles.push(createParticle(canvas, config));
+    }
+  }, [createParticle]);
+
+  // Draw nodes with improved visibility
+  const drawNodes = useCallback((ctx: CanvasRenderingContext2D, nodes: Node[], config: any) => {
+    // Add subtle glow effect
+    ctx.shadowColor = 'rgba(100, 150, 255, 0.3)';
+    ctx.shadowBlur = 4;
+    
+    ctx.fillStyle = `rgba(100, 150, 255, ${config.nodeOpacity})`;
+    nodes.forEach(node => {
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, config.nodeSize, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    
+    // Reset shadow
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+  }, []);
+
+  // Draw connections with improved visibility
+  const drawConnections = useCallback((ctx: CanvasRenderingContext2D, nodes: Node[], config: any) => {
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < config.connectionDistance) {
+          const opacity = (1 - distance / config.connectionDistance) * config.connectionOpacity;
+          
+          // Add subtle glow to connections
+          ctx.shadowColor = `rgba(100, 150, 255, ${opacity * 0.5})`;
+          ctx.shadowBlur = 2;
+          
+          ctx.strokeStyle = `rgba(100, 150, 255, ${opacity})`;
+          ctx.lineWidth = config.connectionWidth;
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.stroke();
+          
+          // Reset shadow
+          ctx.shadowColor = 'transparent';
+          ctx.shadowBlur = 0;
         }
-      });
-    };
-    window.addEventListener("click", handleClick);
-    return () => window.removeEventListener("click", handleClick);
-  }, [canvasRef, dimensions]);
+      }
+    }
+  }, []);
 
-  useEffect(() => {
+  // Draw particles with improved visibility
+  const drawParticles = useCallback((ctx: CanvasRenderingContext2D, particles: Particle[], config: any) => {
+    particles.forEach(particle => {
+      const opacity = particle.life * config.particleOpacity;
+      
+      // Add subtle glow to particles
+      ctx.shadowColor = `rgba(100, 200, 255, ${opacity * 0.4})`;
+      ctx.shadowBlur = 3;
+      
+      ctx.fillStyle = `rgba(100, 200, 255, ${opacity})`;
+      ctx.beginPath();
+      ctx.arc(particle.x, particle.y, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Reset shadow
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+    });
+  }, []);
+
+  // Main animation loop
+  const animate = useCallback((currentTime: number) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas dimensions
-    canvas.width = dimensions.width;
-    canvas.height = dimensions.height;
-
-    // Initialize nodes if empty
-    if (nodes.current.length === 0) {
-      const nodeCount = Math.min(
-        Math.floor((dimensions.width * dimensions.height) / config.nodeDensity),
-        config.maxNodes
-      );
-      for (let i = 0; i < nodeCount; i++) {
-        nodes.current.push({
-          x: Math.random() * dimensions.width,
-          y: Math.random() * dimensions.height,
-          radius: randomBetween(2, 4),
-          vx: (Math.random() - 0.5) * 0.3,
-          vy: (Math.random() - 0.5) * 0.3,
-          originX: Math.random() * dimensions.width,
-          originY: Math.random() * dimensions.height,
-        });
-      }
+    const config = configRef.current;
+    
+    // Frame rate limiting
+    if (currentTime - lastFrameTimeRef.current < config.frameInterval) {
+      animationFrameRef.current = requestAnimationFrame(animate);
+      return;
     }
+    lastFrameTimeRef.current = currentTime;
 
-    const gradientStart = isDark
-      ? "rgba(180, 100, 255, 0.5)"
-      : "rgba(124, 58, 237, 0.5)";
-    const gradientEnd = isDark
-      ? "rgba(80, 0, 150, 0)"
-      : "rgba(59,130,246, 0)";
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const shockwaveThreshold = 25;
-    const shockwaveForce = 0.08;
+    // Update and draw
+    updateNodes(nodesRef.current, canvas, config);
+    updateParticles(particlesRef.current, canvas, config);
+    
+    drawConnections(ctx, nodesRef.current, config);
+    drawNodes(ctx, nodesRef.current, config);
+    drawParticles(ctx, particlesRef.current, config);
 
-    const animate = () => {
-      const now = Date.now();
-      // Cache canvas dimensions locally
-      const cw = canvas.width;
-      const ch = canvas.height;
-      ctx.clearRect(0, 0, cw, ch);
-      ctx.globalAlpha = 1;
-      // Reset shadow defaults
-      ctx.shadowColor = "transparent";
-      ctx.shadowBlur = 0;
+    animationFrameRef.current = requestAnimationFrame(animate);
+  }, [updateNodes, updateParticles, drawConnections, drawNodes, drawParticles]);
 
-      // Draw background noise
-      const noiseCount = isMobile ? 20 : 50;
-      ctx.fillStyle = isDark ? "rgba(0, 0, 0, 0.05)" : "rgba(255, 255, 255, 0.05)";
-      for (let i = 0; i < noiseCount; i++) {
-        ctx.beginPath();
-        ctx.arc(
-          Math.random() * cw,
-          Math.random() * ch,
-          randomBetween(1, 3),
-          0,
-          Math.PI * 2
-        );
-        ctx.fill();
-      }
+  // Setup canvas
+  const setupCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-      // Update and draw pulses
-      for (let i = pulses.current.length - 1; i >= 0; i--) {
-        const pulse = pulses.current[i];
-        const elapsed = (now - pulse.startTime) / 1000;
-        const oscillation = (Math.cos(elapsed * Math.PI * 4) + 1) / 2;
-        pulse.opacity = pulse.initialOpacity * (1 - elapsed) * oscillation;
-        pulse.radius += pulse.speed;
-        if (
-          pulse.opacity <= 0.02 ||
-          pulse.radius >= pulse.maxRadius ||
-          elapsed > 1
-        ) {
-          pulses.current.splice(i, 1);
-        } else {
-          ctx.beginPath();
-          ctx.arc(pulse.x, pulse.y, pulse.radius * 0.7, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(124,58,237,${(pulse.opacity * 0.4).toFixed(2)})`;
-          ctx.lineWidth = 1;
-          ctx.stroke();
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-          ctx.beginPath();
-          ctx.arc(pulse.x, pulse.y, pulse.radius, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(124,58,237,${pulse.opacity.toFixed(2)})`;
-          ctx.lineWidth = 3;
-          ctx.stroke();
-        }
-      }
+    const caps = getSystemCapabilities();
+    setCapabilities(caps);
+    
+    const config = getConfig(caps);
+    configRef.current = config;
 
-      // Generate pulses and particle bursts (mobile adjustment)
-      const pulseProbability = isMobile ? 0.0075 : 0.015;
-      if (nodes.current.length > 0 && Math.random() < pulseProbability) {
-        const scaleFactor = (cw * ch) / REFERENCE_AREA;
-        const randomIndex = Math.floor(Math.random() * nodes.current.length);
-        const randomNode = nodes.current[randomIndex];
-        pulses.current.push({
-          x: randomNode.x,
-          y: randomNode.y,
-          radius: randomNode.radius,
-          maxRadius: randomBetween(70, 100),
-          speed: config.pulseSpeed + Math.random() * 0.5,
-          startTime: now,
-          initialOpacity: 0.7,
-          opacity: 0.7,
-        });
-        const baseCount = 5 + Math.floor(Math.random() * 5);
-        const particleCount = Math.floor(baseCount * scaleFactor);
-        for (let k = 0; k < particleCount; k++) {
-          particles.current.push({
-            x: randomNode.x,
-            y: randomNode.y,
-            vx: (Math.random() - 0.5) * 3,
-            vy: (Math.random() - 0.5) * 3,
-            size: randomBetween(1, 4),
-            opacity: 1,
-            life: randomBetween(30, 60),
-          });
-        }
-      }
+    // Set canvas size
+    const rect = canvas.getBoundingClientRect();
+    const scale = caps.devicePixelRatio;
+    
+    canvas.width = rect.width * scale;
+    canvas.height = rect.height * scale;
+    
+    ctx.scale(scale, scale);
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
 
-      // Update and draw particles
-      for (let i = particles.current.length - 1; i >= 0; i--) {
-        const p = particles.current[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.life--;
-        p.opacity *= 0.92;
-        p.vx *= 0.98;
-        p.vy *= 0.98;
+    // Initialize
+    nodesRef.current = initializeNodes(canvas, config);
+    particlesRef.current = [];
 
-        ctx.beginPath();
-        ctx.arc(
-          p.x - p.vx * 0.5,
-          p.y - p.vy * 0.5,
-          p.size * 0.5,
-          0,
-          Math.PI * 2
-        );
-        ctx.fillStyle = `rgba(124,58,237,${(p.opacity * 0.3).toFixed(2)})`;
-        ctx.fill();
+    // Start animation
+    animationFrameRef.current = requestAnimationFrame(animate);
+  }, [getSystemCapabilities, getConfig, initializeNodes, animate]);
 
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(124,58,237,${p.opacity.toFixed(2)})`;
-        ctx.fill();
-        if (p.life <= 0 || p.opacity < 0.05) {
-          particles.current.splice(i, 1);
-        }
-      }
+  // Resize handler
+  const handleResize = useCallback(() => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+    setupCanvas();
+  }, [setupCanvas]);
 
-      // Update and draw shockwaves
-      for (let i = shockwaves.current.length - 1; i >= 0; i--) {
-        const sw = shockwaves.current[i];
-        sw.radius += sw.speed;
-        sw.opacity = sw.initialOpacity * (1 - sw.radius / sw.maxRadius);
-        if (sw.radius >= sw.maxRadius) {
-          for (let k = 0; k < 15; k++) {
-            particles.current.push({
-              x: sw.x,
-              y: sw.y,
-              vx: (Math.random() - 0.5) * 5,
-              vy: (Math.random() - 0.5) * 5,
-              size: randomBetween(2, 5),
-              opacity: 1,
-              life: randomBetween(20, 40),
-            });
-          }
-          shockwaves.current.splice(i, 1);
-        } else {
-          ctx.beginPath();
-          ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(124,58,237,${sw.opacity.toFixed(2)})`;
-          ctx.lineWidth = 4;
-          ctx.stroke();
+  // Effects
+  useEffect(() => {
+    setupCanvas();
+    window.addEventListener('resize', handleResize);
 
-          nodes.current.forEach((node) => {
-            const dx = node.x - sw.x;
-            const dy = node.y - sw.y;
-            const dist = Math.hypot(dx, dy);
-            const delta = Math.abs(dist - sw.radius);
-            if (delta < shockwaveThreshold && dist !== 0) {
-              const impulse = (1 - delta / shockwaveThreshold) * shockwaveForce;
-              node.vx += (dx / dist) * impulse;
-              node.vy += (dy / dist) * impulse;
-            }
-          });
-        }
-      }
-
-      // Update nodes and render with enhanced effects
-      nodes.current.forEach((node, i) => {
-        if (mouseActive.current) {
-          const dx = mousePosRef.current.x - node.x;
-          const dy = mousePosRef.current.y - node.y;
-          const dist = Math.hypot(dx, dy);
-          if (dist < config.interactionRadius) {
-            const force = (config.interactionRadius - dist) / config.interactionRadius;
-            node.vx -= dx * force * config.forceMultiplier;
-            node.vy -= dy * force * config.forceMultiplier;
-            ctx.beginPath();
-            ctx.moveTo(node.x, node.y);
-            ctx.lineTo(mousePosRef.current.x, mousePosRef.current.y);
-            const grad = ctx.createLinearGradient(
-              node.x,
-              node.y,
-              mousePosRef.current.x,
-              mousePosRef.current.y
-            );
-            grad.addColorStop(0, gradientStart);
-            grad.addColorStop(1, gradientEnd);
-            ctx.strokeStyle = grad;
-            ctx.lineWidth = ((config.interactionRadius - dist) / config.interactionRadius) * 2;
-            ctx.stroke();
-          }
-        }
-
-        const dxOrigin = node.originX - node.x;
-        const dyOrigin = node.originY - node.y;
-        if (Math.hypot(dxOrigin, dyOrigin) > 150) {
-          node.vx += dxOrigin * 0.003;
-          node.vy += dyOrigin * 0.003;
-        }
-        node.vx += (Math.random() - 0.5) * 0.002;
-        node.vy += (Math.random() - 0.5) * 0.002;
-        node.x += node.vx;
-        node.y += node.vy;
-        if (node.x < 0 || node.x > cw) node.vx = -node.vx * 0.9;
-        if (node.y < 0 || node.y > ch) node.vy = -node.vy * 0.9;
-        node.vx *= config.friction;
-        node.vy *= config.friction;
-
-        const pulseFactor = 1 + 0.3 * Math.sin(now / 400 + i);
-        const isNearMouse =
-          mouseActive.current &&
-          Math.hypot(mousePosRef.current.x - node.x, mousePosRef.current.y - node.y) <
-            config.glowRadius;
-        if (isNearMouse) {
-          // Use shadow settings for a smoother glow
-          ctx.save();
-          ctx.shadowColor = "rgba(124,58,237,0.8)";
-          ctx.shadowBlur = 20;
-          ctx.beginPath();
-          ctx.arc(node.x, node.y, node.radius * pulseFactor * 12, 0, Math.PI * 2);
-          ctx.fillStyle = "rgba(124,58,237,0.2)";
-          ctx.fill();
-
-          ctx.beginPath();
-          ctx.arc(node.x, node.y, node.radius * pulseFactor * 8, 0, Math.PI * 2);
-          ctx.fillStyle = "rgba(124,58,237,0.6)";
-          ctx.fill();
-          ctx.restore();
-        }
-
-        const nodeFill = isNearMouse
-          ? isDark
-            ? "#f472b6"
-            : "#a855f7"
-          : isDark
-          ? "#60a5fa"
-          : "#3b82f6";
-        const gradNode = ctx.createRadialGradient(
-          node.x,
-          node.y,
-          node.radius * 0.2,
-          node.x,
-          node.y,
-          node.radius * pulseFactor * 2
-        );
-        gradNode.addColorStop(0, nodeFill);
-        gradNode.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, node.radius * pulseFactor, 0, Math.PI * 2);
-        ctx.fillStyle = gradNode;
-        ctx.fill();
-
-        // Draw connections between nodes
-        for (let j = i + 1; j < nodes.current.length; j++) {
-          const other = nodes.current[j];
-          const dxNodes = node.x - other.x;
-          const dyNodes = node.y - other.y;
-          const distance = Math.hypot(dxNodes, dyNodes);
-          if (distance < config.connectionDistance) {
-            ctx.beginPath();
-            ctx.moveTo(node.x, node.y);
-            ctx.lineTo(other.x, other.y);
-            const opacity = (1 - distance / config.connectionDistance) * 0.3;
-            const otherNearMouse =
-              mouseActive.current &&
-              Math.hypot(
-                mousePosRef.current.x - other.x,
-                mousePosRef.current.y - other.y
-              ) < config.glowRadius;
-            ctx.strokeStyle =
-              isNearMouse || otherNearMouse
-                ? `rgba(124,58,237,${(opacity * 2).toFixed(2)})`
-                : `rgba(59,130,246,${opacity.toFixed(2)})`;
-            ctx.lineWidth = isNearMouse || otherNearMouse ? 2 : 1;
-            ctx.stroke();
-          }
-        }
-      });
-
-      animationFrameId.current = requestAnimationFrame(animate);
-    };
-
-    animate();
     return () => {
-      if (animationFrameId.current !== null) {
-        cancelAnimationFrame(animationFrameId.current);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
       }
+      window.removeEventListener('resize', handleResize);
     };
-  }, [dimensions, canvasRef, isDark, config]);
-};
-
-export const NeuralBackground: FC = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  useNeuralAnimation(canvasRef);
+  }, [setupCanvas, handleResize]);
 
   return (
-    <div suppressHydrationWarning={true}>
-      <canvas
-        ref={canvasRef}
-        className="fixed top-0 left-0 w-screen h-screen z-0"
-        style={{ pointerEvents: "none" }}
-      />
-    </div>
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 w-full h-full -z-10 pointer-events-none"
+      style={{ 
+        background: 'transparent',
+        willChange: 'auto'
+      }}
+    />
   );
 };
+
+export { NeuralBackground };
+export default NeuralBackground;
