@@ -26,9 +26,23 @@ interface SystemCapabilities {
   isMobile: boolean;
 }
 
+interface Config {
+  nodeCount: number;
+  maxParticles: number;
+  connectionDistance: number;
+  frameInterval: number;
+  nodeOpacity: number;
+  connectionOpacity: number;
+  particleOpacity: number;
+  nodeSpeed: number;
+  particleSpeed: number;
+  nodeSize: number;
+  connectionWidth: number;
+}
+
 const NeuralBackground: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
   const [capabilities, setCapabilities] = useState<SystemCapabilities>({
     level: 'medium',
     maxFPS: 30,
@@ -44,7 +58,7 @@ const NeuralBackground: React.FC = () => {
     
     // Conservative performance assessment
     const hardwareConcurrency = navigator.hardwareConcurrency || 2;
-    const memory = (navigator as any).deviceMemory || 4;
+    const memory = (navigator as { deviceMemory?: number }).deviceMemory || 4;
     
     let level: 'low' | 'medium' | 'high' = 'low';
     let maxFPS = 25;
@@ -114,10 +128,10 @@ const NeuralBackground: React.FC = () => {
   const nodesRef = useRef<Node[]>([]);
   const particlesRef = useRef<Particle[]>([]);
   const lastFrameTimeRef = useRef(0);
-  const configRef = useRef(getConfig(capabilities));
+  const configRef = useRef<Config>(getConfig(capabilities));
 
   // Initialize nodes
-  const initializeNodes = useCallback((canvas: HTMLCanvasElement, config: any) => {
+  const initializeNodes = useCallback((canvas: HTMLCanvasElement, config: Config) => {
     const nodes: Node[] = [];
     for (let i = 0; i < config.nodeCount; i++) {
       nodes.push({
@@ -132,7 +146,7 @@ const NeuralBackground: React.FC = () => {
   }, []);
 
   // Create particle
-  const createParticle = useCallback((canvas: HTMLCanvasElement, config: any): Particle => {
+  const createParticle = useCallback((canvas: HTMLCanvasElement, config: Config): Particle => {
     return {
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
@@ -144,7 +158,7 @@ const NeuralBackground: React.FC = () => {
   }, []);
 
   // Update nodes
-  const updateNodes = useCallback((nodes: Node[], canvas: HTMLCanvasElement, config: any) => {
+  const updateNodes = useCallback((nodes: Node[], canvas: HTMLCanvasElement) => {
     nodes.forEach(node => {
       // Update position
       node.x += node.vx;
@@ -161,7 +175,7 @@ const NeuralBackground: React.FC = () => {
   }, []);
 
   // Update particles
-  const updateParticles = useCallback((particles: Particle[], canvas: HTMLCanvasElement, config: any) => {
+  const updateParticles = useCallback((particles: Particle[], canvas: HTMLCanvasElement, config: Config) => {
     for (let i = particles.length - 1; i >= 0; i--) {
       const particle = particles[i];
       
@@ -187,7 +201,7 @@ const NeuralBackground: React.FC = () => {
   }, [createParticle]);
 
   // Draw nodes with improved visibility
-  const drawNodes = useCallback((ctx: CanvasRenderingContext2D, nodes: Node[], config: any) => {
+  const drawNodes = useCallback((ctx: CanvasRenderingContext2D, nodes: Node[], config: Config) => {
     // Add subtle glow effect
     ctx.shadowColor = 'rgba(100, 150, 255, 0.3)';
     ctx.shadowBlur = 4;
@@ -205,7 +219,7 @@ const NeuralBackground: React.FC = () => {
   }, []);
 
   // Draw connections with improved visibility
-  const drawConnections = useCallback((ctx: CanvasRenderingContext2D, nodes: Node[], config: any) => {
+  const drawConnections = useCallback((ctx: CanvasRenderingContext2D, nodes: Node[], config: Config) => {
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
         const dx = nodes[i].x - nodes[j].x;
@@ -235,7 +249,7 @@ const NeuralBackground: React.FC = () => {
   }, []);
 
   // Draw particles with improved visibility
-  const drawParticles = useCallback((ctx: CanvasRenderingContext2D, particles: Particle[], config: any) => {
+  const drawParticles = useCallback((ctx: CanvasRenderingContext2D, particles: Particle[], config: Config) => {
     particles.forEach(particle => {
       const opacity = particle.life * config.particleOpacity;
       
@@ -275,7 +289,7 @@ const NeuralBackground: React.FC = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Update and draw
-    updateNodes(nodesRef.current, canvas, config);
+    updateNodes(nodesRef.current, canvas);
     updateParticles(particlesRef.current, canvas, config);
     
     drawConnections(ctx, nodesRef.current, config);
