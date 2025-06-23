@@ -1,13 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { NeuralBackground } from "@/components/ui/NeuralBackground";
+import GridBackground from "@/components/ui/GridBackground";
 
 export default function PrivacyPolicy() {
   return (
     <>
-      {/* Neural Network Background */}
-      <NeuralBackground />
+      {/* Background */}
+      <GridBackground />
 
       {/* Ultra Glossy Content Container */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen bg-transparent px-6 py-10">

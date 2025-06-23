@@ -4,7 +4,9 @@ import React, { useState, useEffect, FC } from "react";
 import { motion } from "framer-motion";
 import Typewriter from "typewriter-effect";
 import Image from "next/image";
-import { NeuralBackground } from "@/components/ui/NeuralBackground";
+import GridBackground from "@/components/ui/GridBackground";
+import MobileWrapper from "@/components/ui/MobileWrapper";
+import { useIsMobile, useHapticFeedback } from "@/hooks/useMobile";
 
 // ---------------------------------------------------------------------------
 // Style Constants & Animations
@@ -14,15 +16,10 @@ const glassPanelStyles =
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
-  visible: (i = 0) => ({
+  visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      delay: 0.1 * i,
-      duration: 0.7,
-      ease: [0.6, -0.05, 0.01, 0.99],
-    },
-  }),
+  },
 };
 
 const stagger = {
@@ -56,41 +53,54 @@ const HeroSection: FC = () => {
         {/* Left Column - Content */}
         <div className="lg:order-1">
           {/* Main Header Section */}
-          <motion.div variants={fadeInUp} custom={0} className="mb-12">
+          <motion.div 
+            variants={fadeInUp} 
+            className="mb-12"
+            transition={{ duration: 0.7, ease: "easeOut" }}
+          >
             {/* Profile Photo Section - Mobile Only */}
             <motion.div 
-              className="flex justify-center mb-8 lg:hidden"
+              className="flex justify-center mb-12 lg:hidden"
               variants={fadeInUp}
-              custom={0}
+              transition={{ duration: 0.7, ease: "easeOut" }}
             >
               <motion.div
                 className="relative group cursor-pointer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
               >
-                {/* Animated border ring - Slower animation */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 via-rose-400 to-amber-400 rounded-full blur opacity-50 dark:opacity-70 group-hover:opacity-75 dark:group-hover:opacity-90 transition duration-700 animate-pulse" style={{animationDuration: '3s'}}></div>
+                {/* Animated border ring - Enhanced for larger size */}
+                <div className="absolute -inset-2 bg-gradient-to-r from-orange-400 via-rose-400 to-amber-400 rounded-full blur-sm opacity-60 dark:opacity-80 group-hover:opacity-80 dark:group-hover:opacity-95 transition duration-700 animate-pulse" style={{animationDuration: '3s'}}></div>
                 
-                {/* Photo container - Smaller and adaptive */}
-                <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-3 border-orange-200/60 dark:border-orange-400/40 backdrop-blur-sm shadow-lg dark:shadow-orange-500/20">
+                {/* Photo container - Much larger for mobile */}
+                <div className="relative w-40 h-40 sm:w-48 sm:h-48 md:w-52 md:h-52 rounded-full overflow-hidden border-4 border-white/80 dark:border-stone-800/80 backdrop-blur-sm shadow-2xl dark:shadow-orange-500/30">
                   <Image
                     src="/images/IMG_20241227_022446.jpg"
                     alt="Karthikeya - CS Student & Tech Enthusiast"
                     fill
-                    className="object-cover object-center brightness-105 dark:brightness-110 contrast-105 dark:contrast-110 saturate-110 dark:saturate-125"
+                    className="object-cover object-center brightness-105 dark:brightness-110 contrast-105 dark:contrast-110 saturate-110 dark:saturate-125 transition-all duration-500 group-hover:scale-105"
                     priority
-                    sizes="(max-width: 1024px) 112px, 0px"
+                    sizes="(max-width: 640px) 160px, (max-width: 768px) 192px, 208px"
                   />
                   
-                  {/* Overlay gradient - Adaptive to theme */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-orange-400/15 via-transparent to-transparent dark:from-orange-500/25 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  {/* Overlay gradient - Enhanced for larger size */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-orange-400/20 via-transparent to-transparent dark:from-orange-500/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  
+                  {/* Inner glow effect */}
+                  <div className="absolute inset-0 rounded-full shadow-inner shadow-orange-500/20 dark:shadow-orange-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 </div>
                 
-                {/* Floating particles around photo */}
-                <div className="absolute -top-2 -right-2 w-2 h-2 bg-orange-400 dark:bg-orange-300 rounded-full animate-bounce opacity-50 dark:opacity-70"></div>
-                <div className="absolute -bottom-2 -left-2 w-1.5 h-1.5 bg-rose-400 dark:bg-rose-300 rounded-full animate-bounce opacity-50 dark:opacity-70" style={{animationDelay: '0.5s'}}></div>
-                <div className="absolute top-1/2 -right-3 w-1 h-1 bg-amber-400 dark:bg-amber-300 rounded-full animate-pulse opacity-50 dark:opacity-70"></div>
+                {/* Enhanced floating particles for larger photo */}
+                <div className="absolute -top-4 -right-4 w-3 h-3 bg-orange-400/80 dark:bg-orange-300/90 rounded-full animate-bounce opacity-60 dark:opacity-80 shadow-lg"></div>
+                <div className="absolute -bottom-4 -left-4 w-2.5 h-2.5 bg-rose-400/80 dark:bg-rose-300/90 rounded-full animate-bounce opacity-60 dark:opacity-80 shadow-lg" style={{animationDelay: '0.5s'}}></div>
+                <div className="absolute top-1/4 -right-6 w-2.5 h-2.5 bg-amber-400/80 dark:bg-amber-300/90 rounded-full animate-pulse opacity-60 dark:opacity-80 shadow-lg" style={{animationDuration: '2.5s'}}></div>
+                <div className="absolute bottom-1/4 -left-6 w-2 h-2 bg-orange-300/80 dark:bg-orange-200/90 rounded-full animate-pulse opacity-50 dark:opacity-70 shadow-lg" style={{animationDelay: '1s', animationDuration: '3s'}}></div>
+                <div className="absolute top-3/4 -right-8 w-2 h-2 bg-rose-300/80 dark:bg-rose-200/90 rounded-full animate-bounce opacity-50 dark:opacity-70 shadow-lg" style={{animationDelay: '1.5s'}}></div>
+                
+                {/* Additional orbital particles */}
+                <div className="absolute top-8 -left-8 w-1.5 h-1.5 bg-orange-200/70 dark:bg-orange-400/80 rounded-full animate-pulse opacity-40 dark:opacity-60" style={{animationDuration: '4s'}}></div>
+                <div className="absolute bottom-8 -right-10 w-1.5 h-1.5 bg-amber-200/70 dark:bg-amber-400/80 rounded-full animate-pulse opacity-40 dark:opacity-60" style={{animationDelay: '2s', animationDuration: '3.5s'}}></div>
               </motion.div>
             </motion.div>
 
@@ -131,7 +141,6 @@ const HeroSection: FC = () => {
                 <motion.span
                   key={index}
                   variants={fadeInUp}
-                  custom={index}
                   className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-full bg-orange-100/80 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200 border border-orange-200/50 dark:border-orange-700/50 backdrop-blur-sm will-change-transform transform-gpu"
                   whileHover={{ scale: 1.05 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -145,8 +154,8 @@ const HeroSection: FC = () => {
           {/* Description Section */}
           <motion.div
             variants={fadeInUp}
-            custom={1}
             className="mb-12"
+            transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
           >
             <div className={`text-base sm:text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed p-6 sm:p-8 font-medium ${glassPanelStyles}`}>
               Welcome to my little corner of the internet! 🚀 I'm a computer science student passionate about 
@@ -160,7 +169,7 @@ const HeroSection: FC = () => {
         <motion.div 
           className="hidden lg:flex lg:order-2 justify-center lg:justify-center items-center lg:pt-0"
           variants={fadeInUp}
-          custom={0}
+          transition={{ duration: 0.7, ease: "easeOut" }}
         >
           <motion.div
             className="relative group cursor-pointer"
@@ -213,18 +222,31 @@ const HeroSection: FC = () => {
 };
 
 // ---------------------------------------------------------------------------
-// Home Component
+// Home Component with Mobile Optimization
 // ---------------------------------------------------------------------------
 const Home: FC = () => {
   const [mounted, setMounted] = useState(false);
+  const isMobile = useIsMobile();
+  const { impactLight } = useHapticFeedback();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  const handleRefresh = async () => {
+    // Add haptic feedback for mobile
+    if (isMobile) impactLight();
+    
+    // Simulate refresh (you can replace with actual refresh logic)
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Optional: reload the page or refresh data
+    window.location.reload();
+  };
+
   if (!mounted) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-orange-50 dark:bg-stone-900">
+      <div className="flex min-h-screen items-center justify-center bg-orange-50 dark:bg-black">
         <div className="flex items-center space-x-2">
           <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce"></div>
           <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
@@ -235,12 +257,14 @@ const Home: FC = () => {
   }
 
   return (
-    <div className="relative">
-      <NeuralBackground />
-      <div className="relative z-10 flex flex-col min-h-screen bg-transparent text-gray-800 dark:text-gray-100">
-        <HeroSection />
+    <MobileWrapper onRefresh={handleRefresh}>
+      <div className="relative">
+        <GridBackground />
+        <div className="relative z-10 flex flex-col min-h-screen bg-transparent text-gray-800 dark:text-gray-100">
+          <HeroSection />
+        </div>
       </div>
-    </div>
+    </MobileWrapper>
   );
 };
 

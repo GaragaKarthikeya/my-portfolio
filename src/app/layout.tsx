@@ -2,14 +2,31 @@
 import { Analytics } from "@vercel/analytics/react";
 import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
+import MobileNavigation from "@/components/ui/MobileNavigation";
+import MobileOfflineIndicator from "@/components/ui/MobileOfflineIndicator";
+import { ToastProvider } from "@/components/ui/MobileToast";
 import "@/styles/globals.css";
 import { Inter } from 'next/font/google';
 import { useEffect } from 'react';
 
 const inter = Inter({ 
-  subsets: ['latin'],
+  subsets: ['latin', 'latin-ext'],
   display: 'swap',
-  variable: '--font-inter'
+  variable: '--font-inter',
+  weight: ['300', '400', '500', '600', '700', '800'],
+  style: ['normal', 'italic'],
+  fallback: [
+    'SF Pro Display',
+    'SF Pro Text', 
+    '-apple-system',
+    'BlinkMacSystemFont',
+    'Segoe UI Variable',
+    'Segoe UI',
+    'system-ui',
+    'Helvetica Neue',
+    'Arial',
+    'sans-serif'
+  ]
 });
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -69,20 +86,28 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={inter.variable}>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover, user-scalable=no" />
         <meta name="theme-color" content="#f97316" />
         <meta name="color-scheme" content="light dark" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="format-detection" content="telephone=no" />
         {/* High DPI and Retina Display Support */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
-      <body className={`${inter.className} bg-orange-50 dark:bg-stone-900 m-0 p-0 antialiased`} suppressHydrationWarning>
-        <Navbar />
-        <main className="mt-10 px-4 py-10 max-w-screen-2xl mx-auto">
-          {children}
-        </main>
-        <Footer />  
-        <Analytics />
+      <body className={`${inter.className} bg-orange-50 dark:bg-black m-0 p-0 antialiased touch-manipulation overscroll-none mobile-scroll`} suppressHydrationWarning>
+        <ToastProvider>
+          <MobileOfflineIndicator />
+          <Navbar />
+          <main className="mt-0 md:mt-10 mobile-px py-10 max-w-screen-2xl mx-auto mb-20 md:mb-0">
+            {children}
+          </main>
+          <Footer />  
+          <MobileNavigation />
+          <Analytics />
+        </ToastProvider>
       </body>
     </html>
   );

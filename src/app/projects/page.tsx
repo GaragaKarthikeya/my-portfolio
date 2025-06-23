@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import ProjectCard from "@/components/projects/ProjectCard";
-import { NeuralBackground } from "@/components/ui/NeuralBackground";
+import GridBackground from "@/components/ui/GridBackground";
 
 // We're using a JSON-style inline array for projects.
 const projects = [
@@ -36,7 +36,7 @@ const projects = [
 export default function Projects() {
   return (
     <>
-      <NeuralBackground />
+      <GridBackground />
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen bg-transparent px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: -20 }}

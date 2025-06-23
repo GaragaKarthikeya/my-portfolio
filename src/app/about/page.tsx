@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { NeuralBackground } from "@/components/ui/NeuralBackground";
+import GridBackground from "@/components/ui/GridBackground";
 import { useEffect, useState } from "react";
 import {
   FaEnvelope,
@@ -86,8 +86,8 @@ export default function About() {
 
   return (
     <>
-      {/* Render the heavy NeuralBackground only on non-mobile devices */}
-      {!isMobile && <NeuralBackground />}
+      {/* Grid background for all devices */}
+      <GridBackground />
 
       {/* Cursor Effect - only for desktop; clip to circle to avoid square block shadow */}
       {isMounted && !isMobile && (

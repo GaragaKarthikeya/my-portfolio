@@ -2,13 +2,13 @@
 
 import { motion } from "framer-motion";
 import BlogCard from "@/components/blog/BlogCard";
-import { NeuralBackground } from "@/components/ui/NeuralBackground";
+import GridBackground from "@/components/ui/GridBackground";
 import blogs from "@/constants/blogs.json";
 
 export default function BlogsPage() {
   return (
     <>
-      <NeuralBackground />
+      <GridBackground />
       <div className="relative z-10 min-h-screen bg-transparent py-12 px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: -50 }}

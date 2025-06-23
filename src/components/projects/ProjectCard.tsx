@@ -1,6 +1,7 @@
 import Image, { type StaticImageData } from "next/image";
 import type { FC } from "react";
 import type { Project } from "@/types";
+import { useIsMobile, useHapticFeedback } from "@/hooks/useMobile";
 
 type ProjectProps = Omit<Project, 'image'> & {
   readonly image: string | StaticImageData;
@@ -13,8 +14,17 @@ const ProjectCard: FC<ProjectProps> = ({
   image,
   technologies,
 }) => {
+  const isMobile = useIsMobile();
+  const { impactLight } = useHapticFeedback();
+
+  const handleClick = () => {
+    if (isMobile) {
+      impactLight();
+    }
+  };
+
   return (
-    <article className="group bg-white dark:bg-stone-800 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
+    <article className="group mobile-card hover:shadow-2xl transition-all duration-300 overflow-hidden transform hover:scale-[1.02] active:scale-[0.98]">
       {/* Image Container with improved aspect ratio */}
       <div className="relative w-full h-48 sm:h-56 md:h-64 aspect-video">
         <Image
@@ -29,9 +39,9 @@ const ProjectCard: FC<ProjectProps> = ({
       </div>
 
       {/* Content Container */}
-      <div className="p-6 space-y-4">
+      <div className="p-4 sm:p-6 space-y-4">
         <header>
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-stone-100">
+          <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-stone-100 line-clamp-2">
             {title}
           </h3>
         </header>
@@ -42,14 +52,19 @@ const ProjectCard: FC<ProjectProps> = ({
 
         {technologies.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            {technologies.map((tech) => (
+            {technologies.slice(0, isMobile ? 4 : technologies.length).map((tech) => (
               <span
                 key={tech}
-                className="px-2 py-1 text-xs font-mono bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 rounded"
+                className="px-2 py-1 text-xs font-mono bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 rounded no-select"
               >
                 {tech}
               </span>
             ))}
+            {isMobile && technologies.length > 4 && (
+              <span className="px-2 py-1 text-xs font-mono bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 rounded no-select">
+                +{technologies.length - 4}
+              </span>
+            )}
           </div>
         )}
 
@@ -58,7 +73,8 @@ const ProjectCard: FC<ProjectProps> = ({
             href={link}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-full transition-colors duration-200"
+            onClick={handleClick}
+            className="mobile-button w-full sm:w-auto text-center justify-center inline-flex items-center"
             aria-label={`View ${title} project (opens in new tab)`}
           >
             <span>View Project</span>

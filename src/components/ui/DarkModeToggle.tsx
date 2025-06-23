@@ -1,44 +1,80 @@
-"use client";
-import { useDarkMode } from "@/hooks/useDarkMode";
+  "use client";
 
-export default function DarkModeToggle() {
+import { motion, AnimatePresence } from 'framer-motion';
+import { useDarkMode } from "@/hooks/useDarkMode";
+import { useIsMobile, useHapticFeedback } from '@/hooks/useMobile';
+
+export function DarkModeToggle() {
   const { isDark, toggleDarkMode } = useDarkMode();
+  const isMobile = useIsMobile();
+  const { impactLight } = useHapticFeedback();
+
+  const handleToggle = () => {
+    if (isMobile) {
+      impactLight();
+    }
+    toggleDarkMode();
+  };
 
   return (
-    <button
-      onClick={toggleDarkMode}
-      aria-label="Toggle Dark Mode"
-      className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 transition-all"
+    <motion.button
+      onClick={handleToggle}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+      className="touch-target flex items-center justify-center rounded-full bg-orange-200/50 hover:bg-orange-200 dark:bg-orange-900/50 dark:hover:bg-orange-900 transition-all duration-200 no-select relative overflow-hidden"
     >
-      {isDark ? (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6 text-gray-300"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 3v1m0 16v1m8.485-8.485l-.707-.707M4.929 4.929l-.707-.707M21 12h-1M4 12H3m16.485 4.485l-.707.707M4.929 19.071l-.707.707M12 5a7 7 0 100 14 7 7 0 000-14z"
-          />
-        </svg>
-      ) : (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6 text-yellow-300"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm5.657 2.343a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM18 9a1 1 0 110 2h-1a1 1 0 110-2h1zM5.05 5.05a1 1 0 011.414 0l.707.707a1 1 0 11-1.414 1.414L5.05 6.464a1 1 0 010-1.414zM10 15a5 5 0 110-10 5 5 0 010 10zm7 3a1 1 0 110-2h1a1 1 0 110 2h-1zM3 17a1 1 0 100-2H2a1 1 0 100 2h1zm1.343-2.657a1 1 0 011.414 0l.707.707a1 1 0 11-1.414 1.414l-.707-.707a1 1 0 010-1.414zM10 17a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1z"
-            clipRule="evenodd"
-          />
-        </svg>
-      )}
-    </button>
+      {/* Background sliding animation */}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-500"
+        initial={false}
+        animate={{
+          x: isDark ? '100%' : '0%',
+          opacity: isDark ? 0 : 1
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+      />
+      
+      {/* Icon container */}
+      <div className="relative z-10 flex items-center justify-center">
+        <AnimatePresence mode="wait" initial={false}>
+          {isDark ? (
+            <motion.svg
+              key="moon"
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              exit={{ scale: 0, rotate: 180 }}
+              transition={{ duration: 0.3 }}
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 text-orange-400"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+            </motion.svg>
+          ) : (
+            <motion.svg
+              key="sun"
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              exit={{ scale: 0, rotate: 180 }}
+              transition={{ duration: 0.3 }}
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 text-white"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                clipRule="evenodd"
+              />
+            </motion.svg>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.button>
   );
 }
+
+export default DarkModeToggle;

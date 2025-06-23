@@ -27,6 +27,7 @@ import {
   FaVolumeMute,
 } from "react-icons/fa";
 import useSound from "use-sound";
+import { useIsMobile, useHapticFeedback, useSwipeGesture } from "@/hooks/useMobile";
 
 /* ===============================
    Custom Hook: useTheme
@@ -269,6 +270,8 @@ interface MobileMenuProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   reducedMotion: boolean;
+  onTouchStart: (e: React.TouchEvent) => void;
+  onTouchEnd: (e: React.TouchEvent) => void;
 }
 
 const MobileMenu: FC<MobileMenuProps> = ({
@@ -277,6 +280,8 @@ const MobileMenu: FC<MobileMenuProps> = ({
   isOpen,
   setIsOpen,
   reducedMotion,
+  onTouchStart,
+  onTouchEnd,
 }) => (
   <AnimatePresence initial={false}>
     {isOpen && (
@@ -284,59 +289,106 @@ const MobileMenu: FC<MobileMenuProps> = ({
         <motion.div
           key="overlay"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 0.8 }}
+          animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/30 dark:bg-black/60 backdrop-blur-sm z-40"
+          className="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm z-40"
           onClick={() => setIsOpen(false)}
           role="presentation"
         />
         <FocusLock>
           <motion.div
             key="mobile-menu"
-            initial={{ opacity: 0, y: reducedMotion ? 0 : -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: reducedMotion ? 0 : -20 }}
-            className="fixed top-16 inset-x-0 mx-4 bg-orange-100/90 dark:bg-black/90 shadow-xl rounded-md p-4 flex flex-col z-50 backdrop-blur-xl border border-orange-200/20 dark:border-white/10"
+            initial={{ 
+              opacity: 0, 
+              scale: reducedMotion ? 1 : 0.95,
+              y: reducedMotion ? 0 : -20 
+            }}
+            animate={{ 
+              opacity: 1, 
+              scale: 1,
+              y: 0 
+            }}
+            exit={{ 
+              opacity: 0, 
+              scale: reducedMotion ? 1 : 0.95,
+              y: reducedMotion ? 0 : -20 
+            }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="fixed top-20 inset-x-4 bg-white/95 dark:bg-stone-900/95 shadow-2xl rounded-2xl p-6 flex flex-col z-50 backdrop-blur-xl border border-orange-200/30 dark:border-orange-900/30"
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
             aria-labelledby="mobile-menu-heading"
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
           >
-            <div className="flex justify-between items-center mb-3">
-              <h2 id="mobile-menu-heading" className="text-lg font-medium text-orange-800 dark:text-orange-200">Menu</h2>
+            <div className="flex justify-between items-center mb-6">
+              <h2 id="mobile-menu-heading" className="text-xl font-semibold text-orange-800 dark:text-orange-200">
+                Navigation
+              </h2>
               <motion.button
                 onClick={() => setIsOpen(false)}
-                className="p-2 rounded-full hover:bg-orange-200/50 dark:hover:bg-black/50"
+                className="touch-target p-2 rounded-full bg-orange-100 dark:bg-orange-900/30 hover:bg-orange-200 dark:hover:bg-orange-900/50 transition-colors"
                 aria-label="Close menu"
-                whileHover={reducedMotion ? {} : { scale: 1.1 }}
+                whileHover={reducedMotion ? {} : { scale: 1.05 }}
+                whileTap={reducedMotion ? {} : { scale: 0.95 }}
               >
-                <FaTimes className="w-5 h-5 text-orange-800 dark:text-orange-300" />
+                <FaTimes className="w-5 h-5 text-orange-700 dark:text-orange-300" />
               </motion.button>
             </div>
-            <ul role="menu">
-              {menuItems.map((item) => (
+            
+            <ul role="menu" className="space-y-2">
+              {menuItems.map((item, index) => (
                 <motion.li
                   key={item.name}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ 
+                    opacity: 1, 
+                    x: 0,
+                    transition: { delay: index * 0.1 }
+                  }}
                   whileHover={reducedMotion ? {} : { scale: 1.02 }}
-                  className="mb-2"
+                  whileTap={reducedMotion ? {} : { scale: 0.98 }}
                   role="menuitem"
                 >
                   <Link
                     href={item.path}
-                    className={`flex items-center px-4 py-2 rounded-md relative overflow-hidden ${
+                    className={`flex items-center px-4 py-4 rounded-xl transition-all duration-200 relative overflow-hidden group ${
                       currentPath === item.path
-                        ? "bg-gradient-to-r from-orange-500 to-rose-500 text-white"
-                        : "text-orange-800 dark:text-orange-300 hover:bg-orange-200/30 dark:hover:bg-black/30"
+                        ? "bg-gradient-to-r from-orange-500 to-rose-500 text-white shadow-lg"
+                        : "text-orange-800 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900/30"
                     }`}
                     onClick={() => setIsOpen(false)}
                     aria-current={currentPath === item.path ? "page" : undefined}
                   >
-                    {item.icon}
-                    <span>{item.name}</span>
+                    <div className={`mr-4 p-2 rounded-lg transition-colors ${
+                      currentPath === item.path
+                        ? "bg-white/20"
+                        : "bg-orange-100 dark:bg-orange-900/30 group-hover:bg-orange-200 dark:group-hover:bg-orange-900/50"
+                    }`}>
+                      {item.icon}
+                    </div>
+                    <span className="font-medium text-lg">{item.name}</span>
+                    
+                    {/* Active indicator */}
+                    {currentPath === item.path && (
+                      <motion.div
+                        layoutId="mobileActiveIndicator"
+                        className="absolute right-4 w-2 h-2 bg-white rounded-full"
+                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                      />
+                    )}
                   </Link>
                 </motion.li>
               ))}
             </ul>
+            
+            {/* Bottom decoration */}
+            <div className="mt-6 pt-4 border-t border-orange-200/30 dark:border-orange-900/30">
+              <p className="text-center text-sm text-orange-600/70 dark:text-orange-400/70">
+                Swipe left to close menu
+              </p>
+            </div>
           </motion.div>
         </FocusLock>
       </>
@@ -355,6 +407,38 @@ export default function Navbar() {
   const pathname = usePathname();
   const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const themeButtonRef = useRef<HTMLButtonElement>(null);
+  
+  // Mobile hooks
+  const isMobile = useIsMobile();
+  const { impactLight } = useHapticFeedback();
+  
+  // Swipe to close mobile menu
+  const { handleTouchStart: handleSwipeStart, handleTouchEnd: handleSwipeEnd } = useSwipeGesture(
+    () => {
+      // Swipe left to close menu
+      if (isMenuOpen) {
+        setIsMenuOpen(false);
+        impactLight();
+      }
+    },
+    () => {
+      // Swipe right to open menu (when closed)
+      if (!isMenuOpen && isMobile) {
+        setIsMenuOpen(true);
+        impactLight();
+      }
+    }
+  );
+  
+  // Convert to React TouchEvent handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    handleSwipeStart(e.nativeEvent);
+  };
+  
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    handleSwipeEnd(e.nativeEvent);
+  };
+  
   const [playHover] = useSound("/sounds/hover.mp3", { 
     volume: 0.25,
     // Add error handling
@@ -456,12 +540,14 @@ export default function Navbar() {
       {/* Animated Particles */}
       <Particles particles={particles} removeParticle={removeParticle} />
 
-      {/* Main Navbar */}
+      {/* Main Navbar - Hidden on mobile */}
       <motion.nav
         initial={{ y: reducedMotion ? 0 : -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: reducedMotion ? 0.1 : 0.5 }}
-        className="fixed top-0 inset-x-0 z-50 bg-orange-100/80 dark:bg-black/80 backdrop-blur-xl border-b border-orange-200/20 dark:border-white/10 shadow-sm"
+        className={`fixed top-0 inset-x-0 z-50 bg-orange-100/80 dark:bg-stone-950/95 backdrop-blur-xl border-b border-orange-200/20 dark:border-white/10 shadow-sm ${
+          isMobile ? 'hidden' : ''
+        }`}
         aria-label="Main navigation"
       >
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between relative">
@@ -493,20 +579,50 @@ export default function Navbar() {
             <div className="md:hidden flex items-center justify-end flex-1">
               <motion.button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 rounded-lg hover:bg-orange-200/30 dark:hover:bg-black/30 backdrop-blur-sm border border-orange-300/20 dark:border-white/10 relative z-50 group"
+                className="touch-target p-3 rounded-xl bg-orange-100/50 dark:bg-orange-900/30 hover:bg-orange-200/70 dark:hover:bg-orange-900/50 backdrop-blur-sm border border-orange-300/30 dark:border-orange-800/30 relative z-50 group transition-colors"
                 aria-label="Toggle menu"
                 aria-expanded={isMenuOpen}
-                whileHover={reducedMotion ? {} : { scale: 1.1 }}
+                whileHover={reducedMotion ? {} : { scale: 1.05 }}
+                whileTap={reducedMotion ? {} : { scale: 0.95 }}
               >
-                {isMenuOpen ? (
-                  <FaTimes className="w-6 h-6 text-orange-800 dark:text-orange-300" />
-                ) : (
-                  <div className="space-y-1">
-                    <span className="block w-6 h-0.5 bg-orange-800 dark:bg-orange-300 rounded-full" />
-                    <span className="block w-6 h-0.5 bg-gradient-to-r from-orange-400 to-rose-400 dark:from-orange-300 dark:to-rose-300 rounded-full" />
-                    <span className="block w-6 h-0.5 bg-orange-800 dark:bg-orange-300 rounded-full" />
-                  </div>
-                )}
+                <AnimatePresence mode="wait">
+                  {isMenuOpen ? (
+                    <motion.div
+                      key="close"
+                      initial={{ rotate: -90, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      exit={{ rotate: 90, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <FaTimes className="w-5 h-5 text-orange-700 dark:text-orange-300" />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="menu"
+                      initial={{ rotate: 90, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      exit={{ rotate: -90, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex flex-col gap-1"
+                    >
+                      <motion.span 
+                        className="block w-5 h-0.5 bg-orange-700 dark:bg-orange-300 rounded-full origin-center"
+                        animate={isMenuOpen ? { rotate: 45, y: 4 } : { rotate: 0, y: 0 }}
+                        transition={{ duration: 0.2 }}
+                      />
+                      <motion.span 
+                        className="block w-5 h-0.5 bg-gradient-to-r from-orange-500 to-rose-500 dark:from-orange-400 dark:to-rose-400 rounded-full"
+                        animate={isMenuOpen ? { opacity: 0 } : { opacity: 1 }}
+                        transition={{ duration: 0.2 }}
+                      />
+                      <motion.span 
+                        className="block w-5 h-0.5 bg-orange-700 dark:bg-orange-300 rounded-full origin-center"
+                        animate={isMenuOpen ? { rotate: -45, y: -4 } : { rotate: 0, y: 0 }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.button>
             </div>
 
@@ -547,6 +663,8 @@ export default function Navbar() {
         isOpen={isMenuOpen}
         setIsOpen={setIsMenuOpen}
         reducedMotion={reducedMotion}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       />
     </>
   );
