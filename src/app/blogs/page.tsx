@@ -14,17 +14,17 @@ export default function BlogsPage() {
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="w-full max-w-4xl mx-auto mb-12 p-1 bg-gradient-to-r from-blue-400 to-purple-600 rounded-2xl shadow-2xl"
+          className="w-full max-w-4xl mx-auto mb-12 p-1 bg-gradient-to-r from-orange-400 to-rose-600 rounded-2xl shadow-2xl"
         >
-          <div className="rounded-2xl p-10 bg-gray-200 dark:bg-gray-800 backdrop-blur-sm">
-            <h1 className="text-4xl md:text-5xl font-bold text-center text-gray-800 dark:text-gray-100">
+          <div className="rounded-2xl p-10 bg-orange-50 dark:bg-stone-800 backdrop-blur-sm">
+            <h1 className="text-4xl md:text-5xl font-bold text-center text-orange-800 dark:text-orange-100">
               My Blogs
             </h1>
           </div>
         </motion.div>
 
         <motion.div
-          className="w-full max-w-6xl mx-auto p-1 bg-gradient-to-r from-blue-400 to-purple-600 rounded-2xl shadow-2xl"
+          className="w-full max-w-6xl mx-auto p-1 bg-gradient-to-r from-orange-400 to-rose-600 rounded-2xl shadow-2xl"
           initial="hidden"
           animate="visible"
           variants={{
@@ -36,7 +36,7 @@ export default function BlogsPage() {
             },
           }}
         >
-          <div className="rounded-2xl p-8 bg-gray-200 dark:bg-gray-800 backdrop-blur-sm grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="rounded-2xl p-8 bg-orange-50 dark:bg-stone-800 backdrop-blur-sm grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogs.map((blog, index) => (
               <motion.div
                 key={index}

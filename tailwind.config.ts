@@ -14,7 +14,7 @@ const config: Config = {
       fontFamily: {
         sans: ['var(--font-inter)', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
       },
-      // Custom Colors
+      // Custom Colors - Warm Sunset Theme
       colors: {
         background: {
           DEFAULT: "rgb(var(--background) / <alpha-value>)",
@@ -25,38 +25,38 @@ const config: Config = {
           dark: "rgb(var(--foreground-dark) / <alpha-value>)",
         },
         primary: {
-          DEFAULT: "#4f46e5", // Indigo 600
-          dark: "#4338ca", // Indigo 700
-          accent: "#6366f1", // Indigo 500
+          DEFAULT: "#ea580c", // Orange 600
+          dark: "#c2410c", // Orange 700
+          accent: "#f97316", // Orange 500
         },
         secondary: {
-          DEFAULT: "#db2777", // Pink 600
-          dark: "#be185d", // Pink 700
+          DEFAULT: "#e11d48", // Rose 600
+          dark: "#be123c", // Rose 700
         },
         accent: {
-          DEFAULT: "#0d9488", // Teal 600
-          dark: "#0f766e", // Teal 700
+          DEFAULT: "#f59e0b", // Amber 500
+          dark: "#d97706", // Amber 600
         },
         success: {
           DEFAULT: "#059669", // Emerald 600
           dark: "#047857", // Emerald 700
         },
         warning: {
-          DEFAULT: "#eab308", // Yellow 500
-          dark: "#ca8a04", // Yellow 600
+          DEFAULT: "#f59e0b", // Amber 500
+          dark: "#d97706", // Amber 600
         },
         error: {
           DEFAULT: "#ef4444", // Red 500
           dark: "#dc2626", // Red 600
         },
         muted: {
-          DEFAULT: "#64748b", // Slate 500
-          dark: "#94a3b8", // Slate 400
+          DEFAULT: "#78716c", // Stone 500
+          dark: "#a8a29e", // Stone 400
         },
         gradient: {
-          start: "#6366f1", // Indigo 500
-          middle: "#8b5cf6", // Purple 500
-          end: "#ec4899", // Pink 500
+          start: "#f97316", // Orange 500
+          middle: "#f59e0b", // Amber 500
+          end: "#e11d48", // Rose 600
         },
       },
 

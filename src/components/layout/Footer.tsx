@@ -24,6 +24,7 @@ export default function Footer() {
   const creationYear = 2024;
   const currentYear = new Date().getFullYear();
   const yearRange = currentYear > creationYear ? `${creationYear}-${currentYear}` : creationYear;
+  const [mounted, setMounted] = useState(false);
   const [state, setState] = useState<FormState>({
     isLoading: false,
     isSuccess: false,
@@ -33,6 +34,11 @@ export default function Footer() {
   const [submittedEmails, setSubmittedEmails] = useState<Set<string>>(new Set());
   const [inputFocused, setInputFocused] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
+
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Load subscribed emails from localStorage
   useEffect(() => {
@@ -154,24 +160,37 @@ export default function Footer() {
     }
   };
 
+  // Prevent hydration mismatch by not rendering theme-dependent content until mounted
+  if (!mounted) {
+    return (
+      <footer className="relative w-full bg-transparent py-6">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="flex flex-col items-center space-y-8">
+            <div className="h-1 bg-gradient-to-r from-orange-400 via-amber-400 to-rose-400 w-full mb-8 rounded-full" />
+            <p className="text-center">Loading...</p>
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
   return (
     <>
-      {/* Progress Bar */}
+      {/* Progress Bar with warm gradient */}
       <motion.div
         style={{ scaleX }}
-        className="h-1 bg-gradient-to-r from-blue-500 to-purple-500 fixed bottom-0 left-0 right-0 origin-left z-50"
+        className="h-1 bg-gradient-to-r from-orange-500 to-rose-500 fixed bottom-0 left-0 right-0 origin-left z-50"
       />
 
       {/* Footer with Transparent Background in Both Light and Dark Modes */}
       <motion.footer 
-        className="relative w-full bg-transparent text-gray-800 dark:text-gray-300 py-6 overflow-hidden"
+        className="relative w-full bg-transparent text-gray-800 dark:text-stone-300 py-6 overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1, transition: { duration: 0.5 } }}
-        suppressHydrationWarning
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 relative">
           <div className="flex flex-col items-center space-y-8">
-            <div className="h-1 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 w-full mb-8 rounded-full" />
+            <div className="h-1 bg-gradient-to-r from-orange-400 via-amber-400 to-rose-400 w-full mb-8 rounded-full" />
             <motion.div 
               className="w-full max-w-xs sm:max-w-md"
               variants={slideIn}
@@ -206,25 +225,23 @@ export default function Footer() {
                     type="email"
                     name="user_email"
                     placeholder="Email address"
-                    className="w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400"
+                    className="w-full px-4 py-2.5 rounded-lg text-sm focus:outline-none bg-orange-100 dark:bg-stone-700 text-orange-800 dark:text-orange-200 placeholder-orange-500 dark:placeholder-stone-400"
                     required
                     disabled={state.isLoading}
                     onFocus={() => setInputFocused(true)}
                     onBlur={() => setInputFocused(false)}
                     animate={
                       inputFocused
-                        ? { scale: 1.02, boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.5)' }
+                        ? { scale: 1.02, boxShadow: '0 0 0 2px rgba(249, 115, 22, 0.5)' }
                         : { scale: 1, boxShadow: 'none' }
                     }
-                    suppressHydrationWarning
                   />
                   <motion.button
                     type="submit"
-                    className="w-full px-4 py-2.5 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm font-medium relative overflow-hidden"
+                    className="w-full px-4 py-2.5 rounded-lg bg-gradient-to-r from-orange-500 to-rose-500 text-white text-sm font-medium relative overflow-hidden"
                     disabled={state.isLoading}
                     whileHover={!state.isLoading ? { scale: 1.05 } : undefined}
                     whileTap={!state.isLoading ? { scale: 0.95 } : undefined}
-                    suppressHydrationWarning
                   >
                     {state.isLoading && (
                       <motion.div
@@ -246,19 +263,19 @@ export default function Footer() {
                     </div>
                   </motion.button>
                 </form>
-                <div className="absolute -top-8 right-2 bg-gray-800 dark:bg-gray-700 text-white dark:text-gray-200 px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                  We'll never spam you
+                <div className="absolute -top-8 right-2 bg-stone-800 dark:bg-stone-700 text-white dark:text-orange-200 px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                  I'll never spam you
                 </div>
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 text-center">
                 Join the newsletter for updates
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
-                We respect your privacy. Unsubscribe at any time.
+              <p className="text-xs text-stone-500 dark:text-stone-400 text-center mt-2">
+                I respect your privacy. Unsubscribe at any time.
                 <br />
                 <a 
                   href="/privacy"
-                  className="text-blue-500 dark:text-blue-400 hover:underline"
+                  className="text-orange-500 dark:text-orange-400 hover:underline"
                   aria-label="View privacy policy"
                 >
                   Privacy Policy
@@ -280,11 +297,11 @@ export default function Footer() {
               </SocialLink>
             </motion.div>
             <motion.p 
-              className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-center px-4"
+              className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 text-center px-4"
               variants={slideIn}
             >
               &copy; {yearRange} Karthikeya Garaga. All rights reserved.<br className="sm:hidden" />
-              Built with <span className="text-blue-500 dark:text-blue-400">Next.js</span> &amp; <span className="text-purple-500 dark:text-purple-400">Tailwind</span>
+              Built with <span className="text-orange-500 dark:text-orange-400">Next.js</span> &amp; <span className="text-rose-500 dark:text-rose-400">Tailwind</span>
             </motion.p>
           </div>
         </div>
@@ -309,7 +326,7 @@ const BackToTopButton = () => {
   return (
     <motion.button
       onClick={handleClick}
-      className="fixed bottom-20 right-5 p-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow-lg z-50"
+      className="fixed bottom-20 right-5 p-3 bg-gradient-to-r from-orange-600 to-rose-600 text-white rounded-full shadow-lg z-50"
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.8 }}
@@ -351,11 +368,10 @@ const SocialLink = memo(function SocialLink({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+      className="p-2 rounded-lg hover:bg-orange-200 dark:hover:bg-stone-700 transition-colors"
       aria-label={label}
       whileHover={{ scale: 1.1, transition: { type: 'spring', stiffness: 300 } }}
       whileTap={{ scale: 0.9 }}
-      suppressHydrationWarning
     >
       <motion.span
         whileHover={{ rotateY: 10, rotateX: -5, transition: { type: 'spring' } }}

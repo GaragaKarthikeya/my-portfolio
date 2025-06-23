@@ -135,7 +135,7 @@ const Particles: FC<ParticlesProps> = ({ particles, removeParticle }) => (
           opacity: 0,
         }}
         transition={{ duration: 1.5, ease: "easeOut" }}
-        className="fixed pointer-events-none z-[999] w-2 h-2 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 dark:from-blue-400 dark:to-purple-400"
+        className="fixed pointer-events-none z-[999] w-2 h-2 rounded-full bg-gradient-to-r from-orange-400 to-rose-400 dark:from-amber-400 dark:to-orange-400"
         onAnimationComplete={() => removeParticle(particle.id)}
       />
     ))}
@@ -163,12 +163,11 @@ const ThemeToggle: FC<ThemeToggleProps> = ({
   <motion.button
     ref={buttonRef}
     onClick={toggleTheme}
-    className="p-2 rounded-full backdrop-blur-sm bg-gray-200/30 dark:bg-gray-800/30 border border-gray-300/20 dark:border-gray-700/30 relative overflow-hidden group"
+    className="p-2 rounded-full backdrop-blur-sm bg-orange-200/30 dark:bg-black/30 border border-orange-300/20 dark:border-white/10 relative overflow-hidden group"
     aria-label={`Current theme: ${themeMode} (click to cycle)`}
     whileTap={{ scale: reducedMotion ? 1 : 0.9 }}
     whileHover={{ scale: reducedMotion ? 1 : 1.1 }}
     transition={{ type: "spring", stiffness: 300, damping: 10 }}
-    suppressHydrationWarning
   >
     <AnimatePresence mode="wait">
       {themeMode === "system" ? (
@@ -179,7 +178,7 @@ const ThemeToggle: FC<ThemeToggleProps> = ({
           exit={{ rotate: reducedMotion ? 0 : 180, scale: reducedMotion ? 1 : 0 }}
           transition={{ type: "spring", stiffness: 300 }}
         >
-          <FaDesktop className="w-6 h-6 text-gray-800 dark:text-gray-300" />
+          <FaDesktop className="w-6 h-6 text-orange-800 dark:text-orange-300" />
         </motion.div>
       ) : isDarkMode ? (
         <motion.div
@@ -199,7 +198,7 @@ const ThemeToggle: FC<ThemeToggleProps> = ({
           exit={{ rotate: reducedMotion ? 0 : -180, scale: reducedMotion ? 1 : 0 }}
           transition={{ type: "spring", stiffness: 300 }}
         >
-          <FaMoon className="w-6 h-6 text-gray-800 dark:text-gray-300" />
+          <FaMoon className="w-6 h-6 text-orange-800 dark:text-orange-300" />
         </motion.div>
       )}
     </AnimatePresence>
@@ -241,8 +240,8 @@ const DesktopMenu: FC<DesktopMenuProps> = ({
           href={item.path}
           className={`px-4 py-2 rounded-md flex items-center transition-all relative overflow-hidden group ${
             currentPath === item.path
-              ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg"
-              : "text-gray-800 dark:text-gray-300 hover:bg-gray-200/30 dark:hover:bg-gray-700/30 backdrop-blur-sm border border-gray-300/20 dark:border-gray-600/20"
+              ? "bg-gradient-to-r from-orange-500 to-rose-500 text-white shadow-lg"
+              : "text-orange-800 dark:text-orange-300 hover:bg-orange-200/30 dark:hover:bg-black/30 backdrop-blur-sm border border-orange-300/20 dark:border-white/10"
           }`}
           aria-current={currentPath === item.path ? "page" : undefined}
         >
@@ -297,21 +296,21 @@ const MobileMenu: FC<MobileMenuProps> = ({
             initial={{ opacity: 0, y: reducedMotion ? 0 : -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: reducedMotion ? 0 : -20 }}
-            className="fixed top-16 inset-x-0 mx-4 bg-gray-100/90 dark:bg-gray-900/90 shadow-xl rounded-md p-4 flex flex-col z-50 backdrop-blur-xl border border-gray-200/20 dark:border-gray-800/30"
+            className="fixed top-16 inset-x-0 mx-4 bg-orange-100/90 dark:bg-black/90 shadow-xl rounded-md p-4 flex flex-col z-50 backdrop-blur-xl border border-orange-200/20 dark:border-white/10"
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
             aria-labelledby="mobile-menu-heading"
           >
             <div className="flex justify-between items-center mb-3">
-              <h2 id="mobile-menu-heading" className="text-lg font-medium text-gray-800 dark:text-gray-200">Menu</h2>
+              <h2 id="mobile-menu-heading" className="text-lg font-medium text-orange-800 dark:text-orange-200">Menu</h2>
               <motion.button
                 onClick={() => setIsOpen(false)}
-                className="p-2 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-700/50"
+                className="p-2 rounded-full hover:bg-orange-200/50 dark:hover:bg-black/50"
                 aria-label="Close menu"
                 whileHover={reducedMotion ? {} : { scale: 1.1 }}
               >
-                <FaTimes className="w-5 h-5 text-gray-800 dark:text-gray-300" />
+                <FaTimes className="w-5 h-5 text-orange-800 dark:text-orange-300" />
               </motion.button>
             </div>
             <ul role="menu">
@@ -326,8 +325,8 @@ const MobileMenu: FC<MobileMenuProps> = ({
                     href={item.path}
                     className={`flex items-center px-4 py-2 rounded-md relative overflow-hidden ${
                       currentPath === item.path
-                        ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white"
-                        : "text-gray-800 dark:text-gray-300 hover:bg-gray-200/30 dark:hover:bg-gray-700/30"
+                        ? "bg-gradient-to-r from-orange-500 to-rose-500 text-white"
+                        : "text-orange-800 dark:text-orange-300 hover:bg-orange-200/30 dark:hover:bg-black/30"
                     }`}
                     onClick={() => setIsOpen(false)}
                     aria-current={currentPath === item.path ? "page" : undefined}
@@ -352,6 +351,7 @@ export default function Navbar() {
   const { themeMode, isDarkMode, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [particles, setParticles] = useState<Particle[]>([]);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const themeButtonRef = useRef<HTMLButtonElement>(null);
@@ -373,6 +373,10 @@ export default function Navbar() {
   const particleId = useRef(0);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -434,6 +438,19 @@ export default function Navbar() {
     setParticles((prev) => prev.filter((p) => p.id !== id));
   }, []);
 
+  // Prevent hydration mismatch by not rendering theme-dependent content until mounted
+  if (!mounted) {
+    return (
+      <nav className="fixed top-0 inset-x-0 z-50 bg-orange-100/80 backdrop-blur-xl border-b border-orange-200/20 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="hidden md:flex space-x-4 items-center">
+            <div className="px-4 py-2 rounded-md bg-orange-500 text-white">Loading...</div>
+          </div>
+        </div>
+      </nav>
+    );
+  }
+
   return (
     <>
       {/* Animated Particles */}
@@ -444,9 +461,8 @@ export default function Navbar() {
         initial={{ y: reducedMotion ? 0 : -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: reducedMotion ? 0.1 : 0.5 }}
-        className="fixed top-0 inset-x-0 z-50 bg-gray-100/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200/20 dark:border-gray-800/30 shadow-sm"
+        className="fixed top-0 inset-x-0 z-50 bg-orange-100/80 dark:bg-black/80 backdrop-blur-xl border-b border-orange-200/20 dark:border-white/10 shadow-sm"
         aria-label="Main navigation"
-        suppressHydrationWarning
       >
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between relative">
           {/* Mobile Theme Toggle */}
@@ -477,18 +493,18 @@ export default function Navbar() {
             <div className="md:hidden flex items-center justify-end flex-1">
               <motion.button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 rounded-lg hover:bg-gray-200/30 dark:hover:bg-gray-700/30 backdrop-blur-sm border border-gray-300/20 dark:border-gray-600/20 relative z-50 group"
+                className="p-2 rounded-lg hover:bg-orange-200/30 dark:hover:bg-black/30 backdrop-blur-sm border border-orange-300/20 dark:border-white/10 relative z-50 group"
                 aria-label="Toggle menu"
                 aria-expanded={isMenuOpen}
                 whileHover={reducedMotion ? {} : { scale: 1.1 }}
               >
                 {isMenuOpen ? (
-                  <FaTimes className="w-6 h-6 text-gray-800 dark:text-gray-300" />
+                  <FaTimes className="w-6 h-6 text-orange-800 dark:text-orange-300" />
                 ) : (
                   <div className="space-y-1">
-                    <span className="block w-6 h-0.5 bg-gray-800 dark:bg-gray-300 rounded-full" />
-                    <span className="block w-6 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 dark:from-blue-300 dark:to-purple-300 rounded-full" />
-                    <span className="block w-6 h-0.5 bg-gray-800 dark:bg-gray-300 rounded-full" />
+                    <span className="block w-6 h-0.5 bg-orange-800 dark:bg-orange-300 rounded-full" />
+                    <span className="block w-6 h-0.5 bg-gradient-to-r from-orange-400 to-rose-400 dark:from-orange-300 dark:to-rose-300 rounded-full" />
+                    <span className="block w-6 h-0.5 bg-orange-800 dark:bg-orange-300 rounded-full" />
                   </div>
                 )}
               </motion.button>
@@ -508,17 +524,16 @@ export default function Navbar() {
             {/* Sound Toggle Button */}
             <motion.button
               onClick={() => setSoundEnabled((prev) => !prev)}
-              className="p-2 rounded-full backdrop-blur-sm bg-gray-200/30 dark:bg-gray-800/30 border border-gray-300/20 dark:border-gray-700/30 relative overflow-hidden group"
+              className="p-2 rounded-full backdrop-blur-sm bg-orange-200/30 dark:bg-black/30 border border-orange-300/20 dark:border-white/10 relative overflow-hidden group"
               aria-label={`Sound effects ${soundEnabled ? "enabled" : "disabled"}`}
               whileHover={reducedMotion ? {} : { scale: 1.1 }}
               whileTap={reducedMotion ? {} : { scale: 0.9 }}
               transition={{ type: "spring", stiffness: 300, damping: 10 }}
-              suppressHydrationWarning
             >
               {soundEnabled ? (
-                <FaVolumeUp className="w-6 h-6 text-gray-800 dark:text-gray-300" />
+                <FaVolumeUp className="w-6 h-6 text-orange-800 dark:text-orange-300" />
               ) : (
-                <FaVolumeMute className="w-6 h-6 text-gray-800 dark:text-gray-300" />
+                <FaVolumeMute className="w-6 h-6 text-orange-800 dark:text-orange-300" />
               )}
             </motion.button>
           </div>

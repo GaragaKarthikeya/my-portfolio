@@ -45,27 +45,27 @@ export default function About() {
 
   const interestItems = [
     {
-      icon: <FaMicrochip className="text-2xl text-blue-500" />,
+      icon: <FaMicrochip className="text-2xl text-orange-500" />,
       title: "VLSI Design & Digital Circuits",
       description: "Engrossed in Verilog, VHDL, and digital system design.",
     },
     {
-      icon: <FaCode className="text-2xl text-indigo-500" />,
+      icon: <FaCode className="text-2xl text-amber-500" />,
       title: "Competitive Programming",
       description: "Enthusiastic about algorithmic challenges and problem-solving.",
     },
     {
-      icon: <FaRocket className="text-2xl text-purple-500" />,
+      icon: <FaRocket className="text-2xl text-rose-500" />,
       title: "Space Technologies",
       description: "Fascinated by space exploration and AI solutions for space missions.",
     },
     {
-      icon: <FaLaptopCode className="text-2xl text-pink-500" />,
+      icon: <FaLaptopCode className="text-2xl text-orange-600" />,
       title: "AI & Machine Learning",
       description: "Curious about GPT models, ML algorithms, and their applications.",
     },
     {
-      icon: <FaCode className="text-2xl text-green-500" />,
+      icon: <FaCode className="text-2xl text-amber-600" />,
       title: "Creative Engineering",
       description: "Blending technical expertise with artistic creativity.",
     },
@@ -93,7 +93,7 @@ export default function About() {
       {isMounted && !isMobile && (
         <div className="pointer-events-none fixed inset-0 z-30" aria-hidden="true">
           <div
-            className="absolute w-40 h-40 rounded-full bg-gradient-to-r from-purple-400/20 to-blue-500/20 blur-xl"
+            className="absolute w-40 h-40 rounded-full bg-gradient-to-r from-orange-400/20 to-rose-500/20 blur-xl"
             style={{
               left: `${cursorPosition.x - 80}px`,
               top: `${cursorPosition.y - 80}px`,
@@ -115,22 +115,22 @@ export default function About() {
         >
           <div className="relative rounded-3xl overflow-hidden shadow-2xl">
             {/* Background gradient with glass effect */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/80 to-purple-600/80 backdrop-blur-sm z-0"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-600/80 to-rose-600/80 backdrop-blur-sm z-0"></div>
 
             {/* Light flare effects */}
-            <div className="absolute -top-24 -left-24 w-64 h-64 bg-blue-300/30 rounded-full blur-3xl"></div>
-            <div className="absolute -bottom-32 -right-32 w-80 h-80 bg-purple-400/30 rounded-full blur-3xl"></div>
+            <div className="absolute -top-24 -left-24 w-64 h-64 bg-orange-300/30 rounded-full blur-3xl"></div>
+            <div className="absolute -bottom-32 -right-32 w-80 h-80 bg-rose-400/30 rounded-full blur-3xl"></div>
 
             <div className="relative z-10 p-8 md:p-12 backdrop-blur-sm">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.3 }}
-                className="w-24 h-24 md:w-32 md:h-32 mx-auto mb-6 rounded-full bg-gradient-to-r from-blue-400 to-purple-600 p-1"
+                className="w-24 h-24 md:w-32 md:h-32 mx-auto mb-6 rounded-full bg-gradient-to-r from-orange-400 to-rose-600 p-1"
               >
                 <div className="w-full h-full rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
                   {/* Profile initial or image */}
-                  <span className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 text-transparent bg-clip-text">
+                  <span className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-orange-400 to-rose-600 text-transparent bg-clip-text">
                     KG
                   </span>
                 </div>
@@ -142,7 +142,7 @@ export default function About() {
                 transition={{ duration: 0.8, delay: 0.5 }}
                 className="text-5xl md:text-6xl font-extrabold text-center text-white mb-4 drop-shadow-xl"
               >
-                <span className="bg-gradient-to-r from-blue-200 to-purple-100 text-transparent bg-clip-text">
+                <span className="bg-gradient-to-r from-orange-200 to-rose-100 text-transparent bg-clip-text">
                   Karthikeya Garaga
                 </span>
               </motion.h1>
@@ -151,7 +151,7 @@ export default function About() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 1, delay: 0.7 }}
-                className="text-center text-blue-100 text-xl mb-8 max-w-2xl mx-auto"
+                className="text-center text-orange-100 text-xl mb-8 max-w-2xl mx-auto"
               >
                 IMTech Student at IIIT Bangalore • Electronics & Communication Enthusiast
               </motion.p>
@@ -167,14 +167,14 @@ export default function About() {
                   className="px-6 py-3 rounded-full bg-white/10 text-white font-semibold hover:bg-white/20 transform transition-all duration-300 hover:scale-105 hover:shadow-lg backdrop-blur-sm border border-white/30 flex items-center gap-2"
                 >
                   <span>View Projects</span>
-                  <span className="text-blue-300">→</span>
+                  <span className="text-orange-300">→</span>
                 </a>
                 <a
                   href="mailto:Garaga.Karthikeya@iiitb.ac.in"
                   className="px-6 py-3 rounded-full bg-white/10 text-white font-semibold hover:bg-white/20 transform transition-all duration-300 hover:scale-105 hover:shadow-lg backdrop-blur-sm border border-white/30 flex items-center gap-2"
                 >
                   <span>Contact Me</span>
-                  <FaEnvelope className="text-blue-300" />
+                  <FaEnvelope className="text-orange-300" />
                 </a>
               </motion.div>
             </div>
@@ -186,10 +186,10 @@ export default function About() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.3 }}
-          className="w-full max-w-4xl mb-8 overflow-hidden rounded-3xl shadow-2xl bg-gradient-to-r from-blue-600/10 to-purple-600/10 backdrop-blur-md p-[1px]"
+          className="w-full max-w-4xl mb-8 overflow-hidden rounded-3xl shadow-2xl bg-gradient-to-r from-orange-600/10 to-rose-600/10 backdrop-blur-md p-[1px]"
         >
           <div className="bg-white/10 dark:bg-black/20 backdrop-blur-md rounded-3xl p-8 md:p-10">
-            <h2 className="text-3xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text">
+            <h2 className="text-3xl font-bold mb-6 bg-gradient-to-r from-orange-400 to-rose-500 text-transparent bg-clip-text">
               About Me
             </h2>
 
@@ -214,8 +214,8 @@ export default function About() {
                 I enjoy working on modern web technologies, solving problems, and exploring the latest frameworks. I
                 specialize in front-end development, crafting visually appealing and responsive user interfaces with
                 frameworks like{" "}
-                <span className="font-semibold text-blue-600 dark:text-blue-400">React</span> and{" "}
-                <span className="font-semibold text-blue-600 dark:text-blue-400">Next.js</span>. My goal is to
+                <span className="font-semibold text-orange-600 dark:text-orange-400">React</span> and{" "}
+                <span className="font-semibold text-orange-600 dark:text-orange-400">Next.js</span>. My goal is to
                 deliver smooth user experiences and write clean, maintainable code.
               </motion.p>
             </div>
@@ -227,10 +227,10 @@ export default function About() {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="w-full max-w-4xl mb-8 overflow-hidden rounded-3xl shadow-2xl bg-gradient-to-r from-blue-600/10 to-purple-600/10 backdrop-blur-md p-[1px]"
+          className="w-full max-w-4xl mb-8 overflow-hidden rounded-3xl shadow-2xl bg-gradient-to-r from-orange-600/10 to-rose-600/10 backdrop-blur-md p-[1px]"
         >
           <div className="bg-white/10 dark:bg-black/20 backdrop-blur-md rounded-3xl p-8 md:p-10">
-            <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text">
+            <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-orange-400 to-rose-500 text-transparent bg-clip-text">
               👀 I'm interested in...
             </h2>
 
@@ -263,9 +263,9 @@ export default function About() {
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Learning Section */}
-            <div className="rounded-3xl shadow-2xl bg-gradient-to-bl from-blue-600/10 to-purple-600/10 backdrop-blur-md p-[1px] h-full">
+            <div className="rounded-3xl shadow-2xl bg-gradient-to-bl from-orange-600/10 to-rose-600/10 backdrop-blur-md p-[1px] h-full">
               <div className="bg-white/10 dark:bg-black/20 backdrop-blur-md rounded-3xl p-6 md:p-8 h-full">
-                <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-green-500 text-transparent bg-clip-text flex items-center">
+                <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-orange-400 to-amber-500 text-transparent bg-clip-text flex items-center">
                   <span className="mr-2">🌱</span> Currently learning
                 </h2>
 
@@ -304,9 +304,9 @@ export default function About() {
             </div>
 
             {/* Collaboration Section */}
-            <div className="rounded-3xl shadow-2xl bg-gradient-to-br from-blue-600/10 to-purple-600/10 backdrop-blur-md p-[1px] h-full">
+            <div className="rounded-3xl shadow-2xl bg-gradient-to-br from-orange-600/10 to-rose-600/10 backdrop-blur-md p-[1px] h-full">
               <div className="bg-white/10 dark:bg-black/20 backdrop-blur-md rounded-3xl p-6 md:p-8 h-full">
-                <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-pink-500 text-transparent bg-clip-text flex items-center">
+                <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-rose-400 to-orange-500 text-transparent bg-clip-text flex items-center">
                   <span className="mr-2">💞️</span> Looking to collaborate on
                 </h2>
 
@@ -351,25 +351,25 @@ export default function About() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.8 }}
-          className="w-full max-w-4xl mb-8 overflow-hidden rounded-3xl shadow-2xl bg-gradient-to-r from-blue-600/10 to-purple-600/10 backdrop-blur-md p-[1px]"
+          className="w-full max-w-4xl mb-8 overflow-hidden rounded-3xl shadow-2xl bg-gradient-to-r from-orange-600/10 to-rose-600/10 backdrop-blur-md p-[1px]"
         >
           <div className="bg-white/10 dark:bg-black/20 backdrop-blur-md rounded-3xl p-8 md:p-10">
             <section className="mb-10">
-              <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text border-b border-gray-400 dark:border-gray-600 pb-2">
+              <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-orange-400 to-rose-500 text-transparent bg-clip-text border-b border-orange-400 dark:border-orange-600 pb-2">
                 📫 How to reach me
               </h2>
               <p className="leading-relaxed text-gray-800 dark:text-gray-100">
                 Feel free to reach out via email at{" "}
                 <a
                   href="mailto:Garaga.Karthikeya@iiitb.ac.in"
-                  className="underline text-blue-400 dark:text-blue-300"
+                  className="underline text-orange-400 dark:text-orange-300"
                 >
                   Garaga.Karthikeya@iiitb.ac.in
                 </a>
                 . Connect with me on LinkedIn for professional opportunities (
                 <a
                   href="https://www.linkedin.com/in/karthikeya-garaga/"
-                  className="underline text-blue-400 dark:text-blue-300"
+                  className="underline text-orange-400 dark:text-orange-300"
                 >
                   LinkedIn Profile
                 </a>
@@ -378,14 +378,14 @@ export default function About() {
             </section>
 
             <section className="mb-10">
-              <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text border-b border-gray-400 dark:border-gray-600 pb-2">
+              <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-orange-400 to-rose-500 text-transparent bg-clip-text border-b border-orange-400 dark:border-orange-600 pb-2">
                 😄 Pronouns
               </h2>
               <p className="text-gray-800 dark:text-gray-100">He/Him</p>
             </section>
 
             <section>
-              <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text border-b border-gray-400 dark:border-gray-600 pb-2">
+              <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-orange-400 to-rose-500 text-transparent bg-clip-text border-b border-orange-400 dark:border-orange-600 pb-2">
                 ⚡ Fun fact
               </h2>
               <p className="leading-relaxed text-gray-800 dark:text-gray-100">

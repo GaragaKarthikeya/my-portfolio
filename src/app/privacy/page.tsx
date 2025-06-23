@@ -16,7 +16,7 @@ export default function PrivacyPolicy() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-          className="w-full max-w-4xl p-1 bg-gradient-to-r from-blue-400 to-purple-600 rounded-2xl shadow-2xl mb-8"
+          className="w-full max-w-4xl p-1 bg-gradient-to-r from-orange-400 to-rose-600 rounded-2xl shadow-2xl mb-8"
         >
           <div className="rounded-2xl p-10 bg-gray-200 dark:bg-gray-800 backdrop-blur-sm">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-800 dark:text-gray-100 mb-8 text-center">
@@ -30,7 +30,7 @@ export default function PrivacyPolicy() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2 }}
-          className="w-full max-w-4xl p-1 bg-gradient-to-r from-blue-400 to-purple-600 rounded-2xl shadow-2xl"
+          className="w-full max-w-4xl p-1 bg-gradient-to-r from-orange-400 to-rose-600 rounded-2xl shadow-2xl"
         >
           <div className="rounded-2xl p-8 bg-gray-200 dark:bg-gray-800 backdrop-blur-sm text-left space-y-8">
             <section className="rounded-2xl p-6 bg-white/70 dark:bg-gray-700/70 shadow-inner">
@@ -121,7 +121,7 @@ export default function PrivacyPolicy() {
               <p className="mt-4">
                 <a
                   href="mailto:Garaga.Karthikeya@iiitb.ac.in"
-                  className="text-blue-500 dark:text-blue-400 hover:underline text-lg"
+                  className="text-orange-500 dark:text-orange-400 hover:underline text-lg"
                 >
                   Garaga.Karthikeya@iiitb.ac.in
                 </a>

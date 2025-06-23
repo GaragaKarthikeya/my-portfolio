@@ -42,17 +42,17 @@ export default function Projects() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="w-full max-w-4xl p-1 bg-gradient-to-r from-blue-400 to-purple-600 rounded-2xl shadow-2xl mb-8"
+          className="w-full max-w-4xl p-1 bg-gradient-to-r from-orange-400 to-rose-600 rounded-2xl shadow-2xl mb-8"
         >
-          <div className="rounded-2xl p-10 bg-gray-200 dark:bg-gray-800 backdrop-blur-sm">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-gray-100 text-center drop-shadow-lg">
+          <div className="rounded-2xl p-10 bg-orange-50 dark:bg-stone-800 backdrop-blur-sm">
+            <h1 className="text-4xl md:text-5xl font-bold text-orange-800 dark:text-orange-100 text-center drop-shadow-lg">
               My Projects
             </h1>
           </div>
         </motion.div>
 
         <motion.div
-          className="w-full max-w-6xl p-1 bg-gradient-to-r from-blue-400 to-purple-600 rounded-2xl shadow-2xl"
+          className="w-full max-w-6xl p-1 bg-gradient-to-r from-orange-400 to-rose-600 rounded-2xl shadow-2xl"
           initial="hidden"
           animate="visible"
           variants={{
@@ -60,7 +60,7 @@ export default function Projects() {
             visible: { transition: { staggerChildren: 0.2 } },
           }}
         >
-          <div className="rounded-2xl p-8 bg-gray-200 dark:bg-gray-800 backdrop-blur-sm">
+          <div className="rounded-2xl p-8 bg-orange-50 dark:bg-stone-800 backdrop-blur-sm">
             <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {projects.map((project) => (
                 <motion.div

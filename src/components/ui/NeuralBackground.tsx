@@ -200,13 +200,23 @@ const NeuralBackground: React.FC = () => {
     }
   }, [createParticle]);
 
-  // Draw nodes with improved visibility
+  // Draw nodes with improved visibility and warm colors
   const drawNodes = useCallback((ctx: CanvasRenderingContext2D, nodes: Node[], config: Config) => {
-    // Add subtle glow effect
-    ctx.shadowColor = 'rgba(100, 150, 255, 0.3)';
-    ctx.shadowBlur = 4;
+    // Check if we're in dark mode to match navbar colors
+    const isDarkMode = document.documentElement.classList.contains('dark');
     
-    ctx.fillStyle = `rgba(100, 150, 255, ${config.nodeOpacity})`;
+    if (isDarkMode) {
+      // Dark mode: use amber-400 to match navbar gradient
+      ctx.shadowColor = 'rgba(251, 191, 36, 0.4)'; // amber-400
+      ctx.shadowBlur = 4;
+      ctx.fillStyle = `rgba(251, 191, 36, ${config.nodeOpacity})`;
+    } else {
+      // Light mode: use orange-400 to match navbar gradient
+      ctx.shadowColor = 'rgba(251, 146, 60, 0.4)'; // orange-400
+      ctx.shadowBlur = 4;
+      ctx.fillStyle = `rgba(251, 146, 60, ${config.nodeOpacity})`;
+    }
+    
     nodes.forEach(node => {
       ctx.beginPath();
       ctx.arc(node.x, node.y, config.nodeSize, 0, Math.PI * 2);
@@ -229,11 +239,21 @@ const NeuralBackground: React.FC = () => {
         if (distance < config.connectionDistance) {
           const opacity = (1 - distance / config.connectionDistance) * config.connectionOpacity;
           
-          // Add subtle glow to connections
-          ctx.shadowColor = `rgba(100, 150, 255, ${opacity * 0.5})`;
-          ctx.shadowBlur = 2;
+          // Check if we're in dark mode to match navbar colors
+          const isDarkMode = document.documentElement.classList.contains('dark');
           
-          ctx.strokeStyle = `rgba(100, 150, 255, ${opacity})`;
+          if (isDarkMode) {
+            // Dark mode: use orange-400 for connections to complement amber-400 nodes
+            ctx.shadowColor = `rgba(251, 146, 60, ${opacity * 0.5})`;
+            ctx.shadowBlur = 2;
+            ctx.strokeStyle = `rgba(251, 146, 60, ${opacity})`;
+          } else {
+            // Light mode: use orange-500 for connections to complement orange-400 nodes
+            ctx.shadowColor = `rgba(249, 115, 22, ${opacity * 0.5})`;
+            ctx.shadowBlur = 2;
+            ctx.strokeStyle = `rgba(249, 115, 22, ${opacity})`;
+          }
+          
           ctx.lineWidth = config.connectionWidth;
           ctx.beginPath();
           ctx.moveTo(nodes[i].x, nodes[i].y);
@@ -248,16 +268,42 @@ const NeuralBackground: React.FC = () => {
     }
   }, []);
 
-  // Draw particles with improved visibility
+  // Draw background to match navbar: bg-orange-100/80 dark:bg-stone-900/80
+  const drawBackground = useCallback((ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
+    // Check if we're in dark mode by looking at the document's class
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    
+    if (isDarkMode) {
+      // Dark mode: AMOLED black with 80% opacity (matches navbar bg-black/80)
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'; // pure black with 80% opacity
+    } else {
+      // Light mode: orange-100 with 80% opacity (matches navbar bg-orange-100/80)
+      ctx.fillStyle = 'rgba(255, 237, 213, 0.8)'; // orange-100 with 80% opacity
+    }
+    
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }, []);
+
+  // Draw particles with improved visibility and warm colors
   const drawParticles = useCallback((ctx: CanvasRenderingContext2D, particles: Particle[], config: Config) => {
+    // Check if we're in dark mode to match navbar colors
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    
     particles.forEach(particle => {
       const opacity = particle.life * config.particleOpacity;
       
-      // Add subtle glow to particles
-      ctx.shadowColor = `rgba(100, 200, 255, ${opacity * 0.4})`;
-      ctx.shadowBlur = 3;
+      if (isDarkMode) {
+        // Dark mode: use amber-300 for particles (slightly lighter than nodes)
+        ctx.shadowColor = `rgba(252, 211, 77, ${opacity * 0.4})`;
+        ctx.shadowBlur = 3;
+        ctx.fillStyle = `rgba(252, 211, 77, ${opacity})`;
+      } else {
+        // Light mode: use orange-300 for particles (slightly lighter than nodes)
+        ctx.shadowColor = `rgba(253, 186, 116, ${opacity * 0.4})`;
+        ctx.shadowBlur = 3;
+        ctx.fillStyle = `rgba(253, 186, 116, ${opacity})`;
+      }
       
-      ctx.fillStyle = `rgba(100, 200, 255, ${opacity})`;
       ctx.beginPath();
       ctx.arc(particle.x, particle.y, 1.5, 0, Math.PI * 2);
       ctx.fill();
@@ -285,8 +331,9 @@ const NeuralBackground: React.FC = () => {
     }
     lastFrameTimeRef.current = currentTime;
 
-    // Clear canvas
+    // Clear canvas and draw warm background
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBackground(ctx, canvas);
 
     // Update and draw
     updateNodes(nodesRef.current, canvas);
@@ -297,7 +344,7 @@ const NeuralBackground: React.FC = () => {
     drawParticles(ctx, particlesRef.current, config);
 
     animationFrameRef.current = requestAnimationFrame(animate);
-  }, [updateNodes, updateParticles, drawConnections, drawNodes, drawParticles]);
+  }, [updateNodes, updateParticles, drawConnections, drawNodes, drawParticles, drawBackground]);
 
   // Setup canvas
   const setupCanvas = useCallback(() => {

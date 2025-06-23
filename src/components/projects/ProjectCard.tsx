@@ -14,7 +14,7 @@ const ProjectCard: FC<ProjectProps> = ({
   technologies,
 }) => {
   return (
-    <article className="group bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
+    <article className="group bg-white dark:bg-stone-800 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
       {/* Image Container with improved aspect ratio */}
       <div className="relative w-full h-48 sm:h-56 md:h-64 aspect-video">
         <Image
@@ -31,12 +31,12 @@ const ProjectCard: FC<ProjectProps> = ({
       {/* Content Container */}
       <div className="p-6 space-y-4">
         <header>
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-stone-100">
             {title}
           </h3>
         </header>
 
-        <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed line-clamp-3">
+        <p className="text-gray-600 dark:text-stone-300 text-sm leading-relaxed line-clamp-3">
           {description}
         </p>
 
@@ -45,7 +45,7 @@ const ProjectCard: FC<ProjectProps> = ({
             {technologies.map((tech) => (
               <span
                 key={tech}
-                className="px-2 py-1 text-xs font-mono bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded"
+                className="px-2 py-1 text-xs font-mono bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 rounded"
               >
                 {tech}
               </span>
@@ -58,7 +58,7 @@ const ProjectCard: FC<ProjectProps> = ({
             href={link}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-colors duration-200"
+            className="inline-flex items-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-full transition-colors duration-200"
             aria-label={`View ${title} project (opens in new tab)`}
           >
             <span>View Project</span>
