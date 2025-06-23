@@ -10,6 +10,10 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      // Font Family
+      fontFamily: {
+        sans: ['var(--font-inter)', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
+      },
       // Custom Colors
       colors: {
         background: {
