@@ -156,6 +156,7 @@ export default function Footer() {
     visible: { 
       opacity: 1,
       y: 0,
+      transition: { type: 'spring', bounce: 0.4, duration: 0.8 }
     }
   };
 
@@ -195,7 +196,6 @@ export default function Footer() {
               variants={slideIn}
               initial="hidden"
               animate="visible"
-              transition={{ type: 'spring', bounce: 0.4, duration: 0.8 }}
             >
               {state.successMessage && (
                 <motion.div
@@ -285,7 +285,6 @@ export default function Footer() {
             <motion.div 
               className="flex space-x-5 px-2 w-full justify-center"
               variants={slideIn}
-              transition={{ type: 'spring', bounce: 0.4, duration: 0.8, delay: 0.1 }}
             >
               <SocialLink href="https://github.com/GaragaKarthikeya" label="GitHub">
                 <GitHubIcon />
@@ -300,7 +299,6 @@ export default function Footer() {
             <motion.p 
               className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 text-center px-4"
               variants={slideIn}
-              transition={{ type: 'spring', bounce: 0.4, duration: 0.8, delay: 0.2 }}
             >
               &copy; {yearRange} Karthikeya Garaga. All rights reserved.<br className="sm:hidden" />
               Built with <span className="text-orange-500 dark:text-orange-400">Next.js</span> &amp; <span className="text-rose-500 dark:text-rose-400">Tailwind</span>

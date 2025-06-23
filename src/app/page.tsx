@@ -16,10 +16,15 @@ const glassPanelStyles =
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
-  visible: {
+  visible: (i = 0) => ({
     opacity: 1,
     y: 0,
-  },
+    transition: {
+      delay: 0.1 * i,
+      duration: 0.7,
+      ease: [0.6, -0.05, 0.01, 0.99],
+    },
+  }),
 };
 
 const stagger = {
@@ -53,16 +58,12 @@ const HeroSection: FC = () => {
         {/* Left Column - Content */}
         <div className="lg:order-1">
           {/* Main Header Section */}
-          <motion.div 
-            variants={fadeInUp} 
-            className="mb-12"
-            transition={{ duration: 0.7, ease: "easeOut" }}
-          >
+          <motion.div variants={fadeInUp} custom={0} className="mb-12">
             {/* Profile Photo Section - Mobile Only */}
             <motion.div 
               className="flex justify-center mb-12 lg:hidden"
               variants={fadeInUp}
-              transition={{ duration: 0.7, ease: "easeOut" }}
+              custom={0}
             >
               <motion.div
                 className="relative group cursor-pointer"
@@ -141,6 +142,7 @@ const HeroSection: FC = () => {
                 <motion.span
                   key={index}
                   variants={fadeInUp}
+                  custom={index}
                   className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-full bg-orange-100/80 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200 border border-orange-200/50 dark:border-orange-700/50 backdrop-blur-sm will-change-transform transform-gpu"
                   whileHover={{ scale: 1.05 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -154,8 +156,8 @@ const HeroSection: FC = () => {
           {/* Description Section */}
           <motion.div
             variants={fadeInUp}
+            custom={1}
             className="mb-12"
-            transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
           >
             <div className={`text-base sm:text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed p-6 sm:p-8 font-medium ${glassPanelStyles}`}>
               Welcome to my little corner of the internet! 🚀 I'm a computer science student passionate about 
@@ -169,7 +171,7 @@ const HeroSection: FC = () => {
         <motion.div 
           className="hidden lg:flex lg:order-2 justify-center lg:justify-center items-center lg:pt-0"
           variants={fadeInUp}
-          transition={{ duration: 0.7, ease: "easeOut" }}
+          custom={0}
         >
           <motion.div
             className="relative group cursor-pointer"

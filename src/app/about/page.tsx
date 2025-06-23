@@ -86,7 +86,7 @@ export default function About() {
 
   return (
     <>
-      {/* Grid background for all devices */}
+      {/* Grid background for all devices - much lighter than neural */}
       <GridBackground />
 
       {/* Cursor Effect - only for desktop; clip to circle to avoid square block shadow */}

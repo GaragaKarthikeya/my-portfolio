@@ -6,7 +6,7 @@ import GridBackground from "@/components/ui/GridBackground";
 export default function PrivacyPolicy() {
   return (
     <>
-      {/* Background */}
+      {/* Neural Network Background */}
       <GridBackground />
 
       {/* Ultra Glossy Content Container */}
